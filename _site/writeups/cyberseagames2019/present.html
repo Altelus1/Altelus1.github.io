@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Present</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Present" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="[BINARY] Present - 100 Pts. We were given this file:" />
+<meta property="og:description" content="[BINARY] Present - 100 Pts. We were given this file:" />
+<link rel="canonical" href="http://localhost:4000/writeups/cyberseagames2019/present" />
+<meta property="og:url" content="http://localhost:4000/writeups/cyberseagames2019/present" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-12-22T14:05:20-05:00" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Present","dateModified":"2019-12-22T14:05:20-05:00","datePublished":"2019-12-22T14:05:20-05:00","url":"http://localhost:4000/writeups/cyberseagames2019/present","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/writeups/cyberseagames2019/present"},"description":"[BINARY] Present - 100 Pts. We were given this file:","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="binary-present---100-pts">[BINARY] Present - 100 Pts.</h1>
+<p><br />
+We were given this file:
+<br /></p>
+
+<p><img src="images/present_1.png" alt="lol it didn't load" />
+<br />
+After extracting the contents, we got present.exe.
+We can also see what kind of file type it is. A PE binary but packed with UPX (Ultimate Packer for eXecutables)</p>
+
+<p><img src="images/present_2.png" alt="lol it didn't load" />
+<br /></p>
+
+<p>We can unpack this using the UPX tool.</p>
+
+<p><img src="images/present_3.png" alt="lol it didn't load" />
+<br /></p>
+
+<p>After unpacking, we can now see that it is a windows PE 32 bit. We can do static analysis against the unpacked PE to investigate what it really does.</p>
+
+<p><img src="images/present_4.png" alt="lol it didn't load" /></p>
+
+<p><img src="images/present_5.png" alt="lol it didn't load" />
+<br /></p>
+
+<p>To investigate the binary, we used Cutter (radare2 w/ GUI)</p>
+
+<p><img src="images/present_6.png" alt="lol it didn't load" height="100%" width="100%" /></p>
+
+<p>First, we have to find the main. From the image above, it is concluded
+that the “main” identified by the Cutter (highlighted)
+doesn’t really do that’s interesting. Therefore, we proceeded finding
+other interesting functions</p>
+
+<p><br />
+In the image below, we can see there are two mains:</p>
+
+<pre><code class="language-C">sym.__main and sym._main
+</code></pre>
+
+<p><img src="images/present_8.png" alt="lol it didn't load" /></p>
+
+<p>Let’s see what</p>
+
+<p><code class="highlighter-rouge">sym.__main</code></p>
+
+<p>does… It looks like it only goes to the .ctors of the binary</p>
+
+<p><img src="images/present_9.png" alt="lol it didn't load" /></p>
+
+<p>Let’s check <code class="highlighter-rouge">sym._main</code>… There’s an interesting string that’s encoded in base64</p>
+
+<p><img src="images/present_10.png" alt="lol it didn't load" /></p>
+
+<p><br />
+After decoding, we got the flag.</p>
+
+<p><img src="images/present_11.png" alt="lol it didn't load" /></p>
+
+<p>:D :D :D</p>
+
+<p>Thank you for reading!</p>
+
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>

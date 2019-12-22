@@ -1,0 +1,30 @@
+I"�	<h1 id="misc-45-shades-of-christmas---280-pts">[MISC] 45 Shades of Christmas - 280 Pts.</h1>
+
+<h1 id="challenge-description">Challenge Description</h1>
+<p><img src="images/45shadesofchristmas_1.png" alt="lol it didn't load" />
+<br /></p>
+
+<p>We are given a BMP file. Looks
+<img src="images/45shadesofchristmas_2.png" alt="lol it didn't load" />
+<img src="images/45shadesofchristmas_3.png" alt="lol it didn't load" /></p>
+
+<p>Looks like we have to work on it pixel by pixel. Let’s open it.
+I used PIL python module.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="nb">open</span><span class="p">(</span><span class="s">'grey.bmp'</span><span class="p">)</span>
+<span class="n">pix</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">load</span><span class="p">()</span></code></pre></figure>
+
+<p><br />
+Now, let’s see the values of the pixels of if there are anything unusual to them.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">pixels</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+  <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pix</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">])</span>
+  <span class="n">pixels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> </code></pre></figure>
+
+<p>Let’s look at first row</p>
+
+:ET

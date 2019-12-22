@@ -1,0 +1,33 @@
+# Example Site settings
+
+#google_analytics: UA-NNNNNNNN-N
+
+header_pages:
+  - index.md
+  - about.md
+  - writeups/index.md
+
+#footer: 'follow us on <a href="https://twitter.com/">twitter</a>'
+
+#style: light # dark (default) or light
+#listen_for_clients_preferred_style: true # true or false (default)
+
+plugins:
+  - jekyll-seo-tag
+
+collections:
+  cyberseagames2019:
+    output: true
+    permalink: writeups/cyberseagames2019/:path
+    title: Cyber SEA Games 2019
+  tuctf2019:
+    output: true
+    permalink: writeups/tuctf2019/:path
+    title: TUCTF 2019
+  xmasctf2019:
+    output: true
+    permalink: writeups/xmasctf2019/:path
+    title: X-MAS CTF 2019
+
+collections_dir: writeups
+

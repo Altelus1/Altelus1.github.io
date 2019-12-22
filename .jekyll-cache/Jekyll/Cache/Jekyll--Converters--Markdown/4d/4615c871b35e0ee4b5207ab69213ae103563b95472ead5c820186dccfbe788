@@ -1,0 +1,52 @@
+I"/<h1 id="reversing-discount-vmprotect---465-pts">[REVERSING] Discount VMProtect - 465 Pts.</h1>
+<p><br /></p>
+
+<h1 id="challenge-description">Challenge Description:</h1>
+
+<p><img src="images/discountvmprotect_1.png" alt="lol it didn't load" /></p>
+
+<p><br />
+Then the challenge gives us this file:
+<img src="images/discountvmprotect_2.png" alt="lol it didn't load" /></p>
+
+<p><br />
+Let’s see what the ELF file does.
+<img src="images/discountvmprotect_3.png" alt="lol it didn't load" /></p>
+
+<p>It basically asks for a password then checks if it matches to the password embedded inside the executable, which is also probably the flag.</p>
+
+<p><br />
+Let’s run gdb on it and do static analysis. Let’s check for functions and how much symbols is left since the <code class="highlighter-rouge">file</code> command says it is stripped.</p>
+
+<p><img src="images/discountvmprotect_4.png" alt="lol it didn't load" />
+Hmmm… There is no main and only plt entries remained. Let’s find the entry point and the main then.
+<br />
+The entry point is at <code class="highlighter-rouge">0x400770</code>.
+<img src="images/discountvmprotect_5.png" alt="lol it didn't load" /></p>
+
+<p><br />
+Then our main address is 0x400c88.
+<img src="images/discountvmprotect_6.png" alt="lol it didn't load" />
+<br /></p>
+
+<p>This is the whole main assembly code
+<img src="images/discountvmprotect_7.png" alt="lol it didn't load" /></p>
+
+<p>Summary of main:</p>
+<ul>
+  <li>The program asks for user input and stores it to 0x6026a0, calls 0x400857, then if the first byte from 0x6025a0 is 1, then we got the password.</li>
+</ul>
+
+<p><br />
+Let’s check Ghidra if we got the same analysis to it.
+<img src="images/discountvmprotect_9.png" alt="lol it didn't load" />
+We got the same analysis. Great! We noticed also that the 0x400857 is called two times. Let’s check what are the instructions inside this function. Let’s see what 0x400857 does.
+<br />
+In Ghidra:
+<img src="images/discountvmprotect_10.png" alt="lol it didn't load" />
+Hmmm…weird, it only returns. Let’s check gdb then.
+<br /></p>
+
+<p>In GDB:</p>
+
+:ET
