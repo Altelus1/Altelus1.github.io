@@ -9,7 +9,7 @@ $base-font-size:       22.5px !default;
 $mobile-font-size:     12px !default;
 $base-line-height:     1.5 !default;
 $container-width:      90% !default;
-$container-max-width:  1000px !default;
+$container-max-width:  1200px !default;
 
 /**
  * Global
@@ -38,6 +38,13 @@ header { margin-top: 25px;  margin-bottom: 10px; }
 header p { text-align: left;  margin: 0; }
 footer { margin-bottom: 20px; }
 
+/**
+images
+*/
+img {width: 100%; }
+img[src~="icon"]{max-width: 300px; max-height: 100px}
+img[src~="medium"]{max-width: 500px; max-height: 300px}
+img[src~="big"]{max-width: 700px; max-height: 500px}
 /**
  * Highlight/Markup
  */

@@ -25,7 +25,7 @@ h4:before { content: "####";  margin-right: 9px; }
 h5:before { content: "#####";  margin-right: 9px; }
 h6:before { content: "######";  margin-right: 9px; }*/
 /** Layout */
-.container { width: 90%; max-width: 1000px; margin-right: auto; margin-left: auto; }
+.container { width: 90%; max-width: 1200px; margin-right: auto; margin-left: auto; }
 
 p { word-wrap: break-word; word-break: break-word; white-space: pre-wrap; }
 
@@ -36,6 +36,17 @@ header { margin-top: 25px; margin-bottom: 10px; }
 header p { text-align: left; margin: 0; }
 
 footer { margin-bottom: 20px; }
+
+/**
+images
+*/
+img { width: 100%; }
+
+img[src~="icon"] { max-width: 300px; max-height: 100px; }
+
+img[src~="medium"] { max-width: 500px; max-height: 300px; }
+
+img[src~="big"] { max-width: 700px; max-height: 500px; }
 
 /** Highlight/Markup */
 ::selection { background: var(--selection-background); color: var(--selection-text); }
