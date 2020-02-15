@@ -15,19 +15,4 @@ header_pages:
 plugins:
   - jekyll-seo-tag
 
-collections:
-  cyberseagames2019:
-    output: true
-    permalink: writeups/cyberseagames2019/:path
-    title: Cyber SEA Games 2019
-  tuctf2019:
-    output: true
-    permalink: writeups/tuctf2019/:path
-    title: TUCTF 2019
-  xmasctf2019:
-    output: true
-    permalink: writeups/xmasctf2019/:path
-    title: X-MAS CTF 2019
-
-collections_dir: writeups
 
