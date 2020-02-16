@@ -3,6 +3,8 @@ layout: page
 title: Binary Ultra
 category: BINARY
 type: ctf_cyberseagames2019
+desc: Binary 50 pts
+img-link: /writeups/ctf/cyberseagames2019/images/b_ultra_1.png
 ---
 
 

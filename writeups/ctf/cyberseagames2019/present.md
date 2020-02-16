@@ -3,6 +3,8 @@ layout: page
 title: Present
 category: BINARY
 type: ctf_cyberseagames2019
+desc: Binary 100 Pts.
+img-link: /writeups/ctf/cyberseagames2019/images/present_1.png
 ---
 
 # [BINARY] Present - 100 Pts.

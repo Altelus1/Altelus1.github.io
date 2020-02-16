@@ -3,6 +3,8 @@ layout: page
 title: 45 Shades of Christmas
 category: MISC
 type: ctf_xmasctf2019
+desc: Miscellaneousa 280 Pts
+img-link: images/45shadesofchristmas_1.png
 ---
 
 # [MISC] 45 Shades of Christmas - 280 Pts.
