@@ -3,7 +3,7 @@ title: Json
 category: BOX - MEDIUM
 type: htb_box
 layout: page
-img-link: /writeups/htb/boxes/images/json_1.png# icon
+img-link: /writeups/htb/boxes/images/json_1.png
 desc: 10.10.10.158 - [MEDIUM] Json
 ---
 
