@@ -93,7 +93,7 @@ There is nothing really new in there. Even the password hash is also just "admin
 ![12](/writeups/htb/boxes/images/json_12.png#)
 <br>
 
-- Result at ```/api/token``` curl. Since the ```Bearer``` header is for authentication, we just set its value from the value of the cookie given by ```/api/token```.
+- Result at ```/api/Account``` curl. Since the ```Bearer``` header is for authentication, we just set its value from the value of the cookie given by ```/api/token```.
 ![13](/writeups/htb/boxes/images/json_13.png#)
 
 <br>
@@ -292,7 +292,7 @@ while the config contains encrypted username, password, and a key.
 To reverse or decompile the .NET executable, dotPeek is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.
 
 ![26](/writeups/htb/boxes/images/json_26.png)
-Focusing on the Decrypt() function, it's stated that it used 3DES-EBC as the encryption algorithm. A little problem is that it has ```hashing``` variable that decides whether or not to hash the key. 
+Focusing on the Decrypt() function, it's stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has ```hashing``` variable that decides whether or not to hash the key. 
 
 
 <h2 style="font-size: 1.2em">Decrypting username and password</h2>

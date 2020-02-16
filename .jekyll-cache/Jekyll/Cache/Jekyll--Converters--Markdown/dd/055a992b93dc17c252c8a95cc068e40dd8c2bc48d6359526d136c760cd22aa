@@ -1,4 +1,4 @@
-I"BQ<h1 id="medium-json-">[MEDIUM] Json <br /></h1>
+I"DQ<h1 id="medium-json-">[MEDIUM] Json <br /></h1>
 
 <p><img src="/writeups/htb/boxes/images/json_1.png# icon" alt="Json icon" /></p>
 
@@ -85,7 +85,7 @@ There is nothing really new in there. Even the password hash is also just “adm
 <img src="/writeups/htb/boxes/images/json_12.png#" alt="12" />
 <br /></p>
   </li>
-  <li>Result at <code class="highlighter-rouge">/api/token</code> curl. Since the <code class="highlighter-rouge">Bearer</code> header is for authentication, we just set its value from the value of the cookie given by <code class="highlighter-rouge">/api/token</code>.
+  <li>Result at <code class="highlighter-rouge">/api/Account</code> curl. Since the <code class="highlighter-rouge">Bearer</code> header is for authentication, we just set its value from the value of the cookie given by <code class="highlighter-rouge">/api/token</code>.
 <img src="/writeups/htb/boxes/images/json_13.png#" alt="13" /></li>
 </ul>
 
@@ -272,7 +272,7 @@ After retrieving the two files, it can now be checked that the executable is .NE
 <p>To reverse or decompile the .NET executable, dotPeek is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.</p>
 
 <p><img src="/writeups/htb/boxes/images/json_26.png" alt="26" />
-Focusing on the Decrypt() function, it’s stated that it used 3DES-EBC as the encryption algorithm. A little problem is that it has <code class="highlighter-rouge">hashing</code> variable that decides whether or not to hash the key.</p>
+Focusing on the Decrypt() function, it’s stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has <code class="highlighter-rouge">hashing</code> variable that decides whether or not to hash the key.</p>
 
 <h2 style="font-size: 1.2em">Decrypting username and password</h2>
 <p>Here’s the written python script to decrypt the username and password.</p>
