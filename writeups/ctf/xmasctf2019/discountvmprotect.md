@@ -4,7 +4,7 @@ title: Discount VMProtect
 category: REVERSING
 type: ctf_xmasctf2019
 desc: Reverse Engineering 465 Pts.
-img-link: images/discountvmprotect_1.png
+img-link: /writeups/ctf/xmasctf2019/images/discountvmprotect_1.png
 ---
 
 # [REVERSING] Discount VMProtect - 465 Pts.

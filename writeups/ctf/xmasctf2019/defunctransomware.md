@@ -4,7 +4,7 @@ title: DeFUNct Ransomware
 category: CRYPTO
 type: ctf_xmasctf2019
 desc: Cryptography 50 Pts.
-img-link: images/defunctransomware_1.png
+img-link: /writeups/ctf/xmasctf2019/images/defunctransomware_1.png
 ---
 
 # [CRYPTO] DeFUNct Ransomware - 50 pts
