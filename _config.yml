@@ -1,3 +1,4 @@
+
 # Example Site settings
 
 #google_analytics: UA-NNNNNNNN-N
@@ -14,5 +15,3 @@ header_pages:
 
 plugins:
   - jekyll-seo-tag
-
-
