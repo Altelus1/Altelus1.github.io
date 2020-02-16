@@ -1,10 +1,14 @@
 
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<meta property="og:image" content="{% if page.img-link %}{{page.img-link}}{% else %}/assets/images/default.png{% endif %}">
-<meta property="og:description" content="{{ page.meta | append: page.desc }}">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta property="og:image" content="{% if page.img-link %}{{page.img-link}}{% else %}/assets/images/default.png{% endif %}">
+    <meta property="og:description" content="{{ page.meta | append: page.desc }}">
+    <meta name="twitter:title" content="{{ page.title }}">
+    <meta name="twitter:description" content="{{ page.meta | append: page.desc }}">
+    <meta name="twitter:image" content="{% if page.img-link %}{{page.img-link}}{% else %}/assets/images/default.png{% endif %}">
+    <meta name="twitter:card" content="summary_large_image">
     <title>{{ page.title }}</title>
   {%- seo title=false -%}
 
