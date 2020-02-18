@@ -1,36 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-      
-    <meta name="twitter:title" content="Json">
-    <meta name="twitter:description" content="10.10.10.158 - [MEDIUM] Json by Altelus">
-    <meta name="twitter:card" content="summary">
-
-    <meta property="og:image" content="/writeups/htb/boxes/images/json_1.png">
-    <meta property="og:description" content="10.10.10.158 - [MEDIUM] Json by Altelus">
-    <title>Json</title><!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="Json" />
-<meta property="og:locale" content="en_US" />
-<link rel="canonical" href="http://localhost:4000/writeups/htb/boxes/Json.html" />
-<meta property="og:url" content="http://localhost:4000/writeups/htb/boxes/Json.html" />
-<script type="application/ld+json">
-{"@type":"WebPage","headline":"Json","url":"http://localhost:4000/writeups/htb/boxes/Json.html","@context":"https://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
-
-
-<body>
-    <div class="container"><header>
-  <div class="menu">
-    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li></ul>
-  </div>
-</header>
-<main>
-      <h1 id="medium-json-">[MEDIUM] Json <br /></h1>
+I"Ü<h1 id="medium-json-">[MEDIUM] Json <br /></h1>
 
 <p><img src="/writeups/htb/boxes/images/json_1.png# icon" alt="Json icon" /></p>
 
@@ -464,10 +432,8 @@ To check privileges:</p>
 
 <p><img src="/writeups/htb/boxes/images/json_20.png# big" alt="20" /></p>
 
-<p>Windows 2019 and Windows 10 1809 are unaffected by this but the version of Windows of the server is of earlier version.
-To check system information:</p>
-<pre><code class="language-cmd">systeminfo
-</code></pre>
+<p>Windows 2019 and Windows 10 1809 are unaffected by this but the version of Windows of the server is of earlier version.</p>
+
 <p><img src="/writeups/htb/boxes/images/json_21.png# big" alt="21" /></p>
 
 <h3 id="juicypotato-exploitation">JuicyPotato Exploitation</h3>
@@ -580,11 +546,4 @@ PASS: funnyhtb
 <br />
 Thank you for reading.</p>
 
-
-
-    </main><footer>
-  
-</footer>
-</div>
-  </body>
-</html>
+:ET
