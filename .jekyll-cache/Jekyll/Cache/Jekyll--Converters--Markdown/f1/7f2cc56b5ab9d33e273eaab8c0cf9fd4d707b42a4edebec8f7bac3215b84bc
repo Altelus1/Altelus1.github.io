@@ -1,9 +1,9 @@
-I"DQ<h1 id="medium-json-">[MEDIUM] Json <br /></h1>
+I"éq<h1 id="medium-json-">[MEDIUM] Json <br /></h1>
 
 <p><img src="/writeups/htb/boxes/images/json_1.png# icon" alt="Json icon" /></p>
 
-<h2 style="font-size: 1.4em">Enumeration</h2>
-<h2 style="font-size: 1.2em">NMAP</h2>
+<h2 id="enumeration">Enumeration</h2>
+<h3 id="nmap">NMAP</h3>
 
 <p>We have our nmap scan run the following:</p>
 
@@ -14,9 +14,100 @@ nmap <span class="nt">-sV</span> <span class="nt">-sC</span> <span class="nt">-A
 
 <p>Then here is the result:</p>
 
-<p><img src="/writeups/htb/boxes/images/json_2.png" alt="2" /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Host is up <span class="o">(</span>0.28s latency<span class="o">)</span><span class="nb">.</span>
+Not shown: 9976 closed ports
+PORT     STATE    SERVICE       VERSION
+21/tcp   open     ftp           FileZilla ftpd
+| ftp-syst: 
+|_  SYST: UNIX emulated by FileZilla
+80/tcp   open     http          Microsoft IIS httpd 8.5
+| http-methods: 
+|   Supported Methods: GET HEAD OPTIONS TRACE
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/8.5
+|_http-title: Json HTB
+135/tcp  open     msrpc         Microsoft Windows RPC
+139/tcp  open     netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp  open     microsoft-ds  Microsoft Windows Server 2008 R2 - 2012 microsoft-ds
+1894/tcp filtered o2server-port
+2465/tcp filtered lbm
+2608/tcp filtered wag-service
+2923/tcp filtered wta-wsp-wtp-s
+3228/tcp filtered dwmsgserver
+3942/tcp filtered srdp
+4110/tcp filtered g2tag
+4939/tcp filtered unknown
+5636/tcp filtered sfm-db-server
+5985/tcp open     http          Microsoft HTTPAPI httpd 2.0 <span class="o">(</span>SSDP/UPnP<span class="o">)</span>
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+6175/tcp filtered unknown
+6822/tcp filtered unknown
+6966/tcp filtered swispol
+7271/tcp filtered unknown
+8079/tcp filtered unknown
+8225/tcp filtered unknown
+8291/tcp filtered unknown
+8337/tcp filtered unknown
+9310/tcp filtered unknown
+No exact OS matches <span class="k">for </span>host <span class="o">(</span>If you know what OS is running on it, see https://nmap.org/submit/ <span class="o">)</span><span class="nb">.</span>
+TCP/IP fingerprint:
+OS:SCAN<span class="o">(</span><span class="nv">V</span><span class="o">=</span>7.80%E<span class="o">=</span>4%D<span class="o">=</span>2/15%OT<span class="o">=</span>21%CT<span class="o">=</span>1%CU<span class="o">=</span>36910%PV<span class="o">=</span>Y%DS<span class="o">=</span>2%DC<span class="o">=</span>T%G<span class="o">=</span>Y%TM<span class="o">=</span>5E477E0
+OS:E%P<span class="o">=</span>x86_64-pc-linux-gnu<span class="o">)</span>SEQ<span class="o">(</span><span class="nv">SP</span><span class="o">=</span>105%GCD<span class="o">=</span>1%ISR<span class="o">=</span>10B%TI<span class="o">=</span>I%CI<span class="o">=</span>I%II<span class="o">=</span>I%SS<span class="o">=</span>S%TS<span class="o">=</span>
+OS:7<span class="o">)</span>SEQ<span class="o">(</span><span class="nv">SP</span><span class="o">=</span>105%GCD<span class="o">=</span>1%ISR<span class="o">=</span>109%TS<span class="o">=</span>7<span class="o">)</span>OPS<span class="o">(</span><span class="nv">O1</span><span class="o">=</span>M54DNW8ST11%O2<span class="o">=</span>M54DNW8ST11%O3<span class="o">=</span>M54
+OS:DNW8NNT11%O4<span class="o">=</span>M54DNW8ST11%O5<span class="o">=</span>M54DNW8ST11%O6<span class="o">=</span>M54DST11<span class="o">)</span>WIN<span class="o">(</span><span class="nv">W1</span><span class="o">=</span>2000%W2<span class="o">=</span>2000%
+OS:W3<span class="o">=</span>2000%W4<span class="o">=</span>2000%W5<span class="o">=</span>2000%W6<span class="o">=</span>2000<span class="o">)</span>ECN<span class="o">(</span><span class="nv">R</span><span class="o">=</span>Y%DF<span class="o">=</span>Y%T<span class="o">=</span>80%W<span class="o">=</span>2000%O<span class="o">=</span>M54DNW8NNS%CC
+OS:<span class="o">=</span>Y%Q<span class="o">=)</span>T1<span class="o">(</span><span class="nv">R</span><span class="o">=</span>Y%DF<span class="o">=</span>Y%T<span class="o">=</span>80%S<span class="o">=</span>O%A<span class="o">=</span>S+%F<span class="o">=</span>AS%RD<span class="o">=</span>0%Q<span class="o">=)</span>T2<span class="o">(</span><span class="nv">R</span><span class="o">=</span>Y%DF<span class="o">=</span>Y%T<span class="o">=</span>80%W<span class="o">=</span>0%S<span class="o">=</span>Z%A<span class="o">=</span>
+OS:S%F<span class="o">=</span>AR%O<span class="o">=</span>%RD<span class="o">=</span>0%Q<span class="o">=)</span>T3<span class="o">(</span><span class="nv">R</span><span class="o">=</span>Y%DF<span class="o">=</span>Y%T<span class="o">=</span>80%W<span class="o">=</span>0%S<span class="o">=</span>Z%A<span class="o">=</span>O%F<span class="o">=</span>AR%O<span class="o">=</span>%RD<span class="o">=</span>0%Q<span class="o">=)</span>T4<span class="o">(</span><span class="nv">R</span><span class="o">=</span>Y%DF
+OS:<span class="o">=</span>Y%T<span class="o">=</span>80%W<span class="o">=</span>0%S<span class="o">=</span>A%A<span class="o">=</span>O%F<span class="o">=</span>R%O<span class="o">=</span>%RD<span class="o">=</span>0%Q<span class="o">=)</span>T5<span class="o">(</span><span class="nv">R</span><span class="o">=</span>Y%DF<span class="o">=</span>Y%T<span class="o">=</span>80%W<span class="o">=</span>0%S<span class="o">=</span>Z%A<span class="o">=</span>S+%F<span class="o">=</span>AR%O<span class="o">=</span>
+OS:%RD<span class="o">=</span>0%Q<span class="o">=)</span>T6<span class="o">(</span><span class="nv">R</span><span class="o">=</span>Y%DF<span class="o">=</span>Y%T<span class="o">=</span>80%W<span class="o">=</span>0%S<span class="o">=</span>A%A<span class="o">=</span>O%F<span class="o">=</span>R%O<span class="o">=</span>%RD<span class="o">=</span>0%Q<span class="o">=)</span>T7<span class="o">(</span><span class="nv">R</span><span class="o">=</span>Y%DF<span class="o">=</span>Y%T<span class="o">=</span>80%W<span class="o">=</span>
+OS:0%S<span class="o">=</span>Z%A<span class="o">=</span>S+%F<span class="o">=</span>AR%O<span class="o">=</span>%RD<span class="o">=</span>0%Q<span class="o">=)</span>U1<span class="o">(</span><span class="nv">R</span><span class="o">=</span>Y%DF<span class="o">=</span>N%T<span class="o">=</span>80%IPL<span class="o">=</span>164%UN<span class="o">=</span>0%RIPL<span class="o">=</span>G%RID<span class="o">=</span>G%RI
+OS:PCK<span class="o">=</span>G%RUCK<span class="o">=</span>G%RUD<span class="o">=</span>G<span class="o">)</span>IE<span class="o">(</span><span class="nv">R</span><span class="o">=</span>Y%DFI<span class="o">=</span>N%T<span class="o">=</span>80%CD<span class="o">=</span>Z<span class="o">)</span>
 
-<p><img src="/writeups/htb/boxes/images/json_3.png" alt="3" /></p>
+Uptime guess: 0.001 days <span class="o">(</span>since Sat Feb 15 00:11:51 2020<span class="o">)</span>
+Network Distance: 2 hops
+TCP Sequence Prediction: <span class="nv">Difficulty</span><span class="o">=</span>261 <span class="o">(</span>Good luck!<span class="o">)</span>
+IP ID Sequence Generation: Busy server or unknown class
+Service Info: OSs: Windows, Windows Server 2008 R2 - 2012<span class="p">;</span> CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 4h11m00s, deviation: 0s, median: 4h11m00s
+| nbstat: NetBIOS name: JSON, NetBIOS user: &lt;unknown&gt;, NetBIOS MAC: 00:50:56:b9:cc:4d <span class="o">(</span>VMware<span class="o">)</span>
+| Names:
+|   JSON&lt;00&gt;             Flags: &lt;unique&gt;&lt;active&gt;
+|   WORKGROUP&lt;00&gt;        Flags: &lt;group&gt;&lt;active&gt;
+|_  JSON&lt;20&gt;             Flags: &lt;unique&gt;&lt;active&gt;
+|_smb-os-discovery: ERROR: Script execution failed <span class="o">(</span>use <span class="nt">-d</span> to debug<span class="o">)</span>
+| smb-security-mode: 
+|   account_used: &lt;blank&gt;
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled <span class="o">(</span>dangerous, but default<span class="o">)</span>
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   <span class="nb">date</span>: 2020-02-15T09:24:44
+|_  start_date: 2020-02-15T09:23:08
+
+TRACEROUTE <span class="o">(</span>using port 23/tcp<span class="o">)</span>
+HOP RTT       ADDRESS
+1   328.88 ms 10.10.14.1
+2   332.69 ms 10.10.10.158
+
+NSE: Script Post-scanning.
+Initiating NSE at 00:13
+Completed NSE at 00:13, 0.00s elapsed
+Initiating NSE at 00:13
+Completed NSE at 00:13, 0.00s elapsed
+Initiating NSE at 00:13
+Completed NSE at 00:13, 0.00s elapsed
+Read data files from: /usr/bin/../share/nmap
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ <span class="nb">.</span>
+Nmap <span class="k">done</span>: 1 IP address <span class="o">(</span>1 host up<span class="o">)</span> scanned <span class="k">in </span>417.37 seconds
+           Raw packets sent: 13749 <span class="o">(</span>609.592KB<span class="o">)</span> | Rcvd: 12330 <span class="o">(</span>696.519KB<span class="o">)</span>
+
+</code></pre></div></div>
 
 <p>Important services:<br />
 FTP - port 21
@@ -27,8 +118,7 @@ SMB - port 445
 HTTP (Winrm service) - port 5985 
 <br /></p>
 
-<h2 style="font-size: 1.2em">FTP Anonymous Login</h2>
-<p><br /></p>
+<h2 id="ftp-anonymous-login">FTP Anonymous Login<br /></h2>
 
 <p>Checking FTP if we can login as anonymous user:</p>
 
