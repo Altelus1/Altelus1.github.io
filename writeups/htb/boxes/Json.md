@@ -529,7 +529,7 @@ while the config contains encrypted username, password, and a key.
 To reverse or decompile the .NET executable, [dotPeek](https://www.jetbrains.com/decompiler/) is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.
 
 ![26](/writeups/htb/boxes/images/json_26.png)
-Focusing on the Decrypt() function, it's stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has ```hashing``` variable that decides whether or not to hash the key. 
+Focusing on the Decrypt() function, it's stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has ```useHashing``` variable that decides whether or not to hash the key. 
 
 
 ### Decrypting username and password
@@ -546,7 +546,9 @@ key = "_5TL#+GWWFv6pfT3!GXw7D86pkRRTv+$$tk^cL5hdU%"
 '''
 Notice that key is not lenth 16 or 24, so
 it needs to be hashed using MD5 hash algo.
-It is also indicated in the reversed .NET exe
+It is also indicated in the reversed .NET executable.
+That's what also probably the useHashing 
+variable used for.
 '''
 
 hh = hashlib.new('md5')
