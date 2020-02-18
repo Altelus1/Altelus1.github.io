@@ -526,7 +526,7 @@ while the config contains encrypted username, password, and a key.
 <br>
 
 ### Reversing the .NET executable
-To reverse or decompile the .NET executable, dotPeek is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.
+To reverse or decompile the .NET executable, [dotPeek](https://www.jetbrains.com/decompiler/) is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.
 
 ![26](/writeups/htb/boxes/images/json_26.png)
 Focusing on the Decrypt() function, it's stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has ```hashing``` variable that decides whether or not to hash the key. 
