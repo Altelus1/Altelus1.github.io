@@ -433,7 +433,7 @@ If "powershell.exe" is used immediately, the server doesn't spawn a shell.
 <br>
 We successfuly spawned a shell with "userpool" as our user!
 
-![18](/writeups/htb/boxes/images/json_18.png# big)
+![18](/writeups/htb/boxes/images/json_18.png# medium)
 <br>
 
 ## User Flag
