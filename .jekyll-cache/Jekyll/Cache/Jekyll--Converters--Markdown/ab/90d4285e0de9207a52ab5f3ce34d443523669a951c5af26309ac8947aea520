@@ -1,39 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-      
-    <meta name="twitter:title" content="UNCRACKABLE">
-    <meta name="twitter:description" content="Binary Pwn 666 pts.">
-    <meta name="twitter:card" content="summary">
-
-    <meta property="og:image" content="/writeups/ctf/securinetspreq2020/images/uncrackable_1.png">
-    <meta property="og:description" content="Binary Pwn 666 pts.">
-    <title>UNCRACKABLE</title><!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="UNCRACKABLE" />
-<meta property="og:locale" content="en_US" />
-<link rel="canonical" href="http://localhost:4000/writeups/ctf/securinetspreq2020/uncrackable.html" />
-<meta property="og:url" content="http://localhost:4000/writeups/ctf/securinetspreq2020/uncrackable.html" />
-<script type="application/ld+json">
-{"@type":"WebPage","url":"http://localhost:4000/writeups/ctf/securinetspreq2020/uncrackable.html","headline":"UNCRACKABLE","@context":"https://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
-
-
-<body>
-    <div class="container"><header>
-  <div class="menu">
-    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li></ul>
-  </div>
-</header>
-<main>
-      <h1 id="pwn-uncrackable---666-pts">[PWN] UNCRACKABLE - 666 pts.</h1>
+I"~<h1 id="pwn-uncrackable---666-pts">[PWN] UNCRACKABLE - 666 pts.</h1>
 
 <p>We’re given this file:
-<img src="images/uncrackable_1.png# medium" alt="file missing" />
+<img src="images/uncrackable_1.png" alt="file missing" />
 <br /></p>
 
 <p>Let’s analyze this with Ghidra. Here is the decompiled main:</p>
@@ -79,7 +47,7 @@
 <br /></p>
 
 <p>Let’s run the challenge locally and create a test flag:
-<img src="images/uncrackable_2.png# big" alt="file missing" />
+<img src="images/uncrackable_2.png" alt="file missing" />
 <br /></p>
 
 <h2 id="exploitation">Exploitation</h2>
@@ -87,48 +55,5 @@
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"echo -n \'%s\'|md5sum"
 </code></pre></div></div>
 <p>This is our exploit string:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>';/bin/bash;#
-</code></pre></div></div>
-<p>And this is going to be the final string:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"echo -n \'\';/bin/bash;#|md5sum;
-</code></pre></div></div>
-<p># - this is to comment out md5sum
-<br /></p>
 
-<p>It worked! The challenge server tried to execute “aaaaaaaaaa” but there is no such command exist. However when a legitimate command is used, “not good enough” is printed instead of supposed output of the respective command. 
-<img src="images/uncrackable_3.png" alt="file missing" />
-<br /></p>
-
-<p>This is because the output from STDOUT is being passed to the variable <code class="highlighter-rouge">local_458</code> instead of printing it. After that, the output is compared to the hard coded hash that’s why “not good enough” is printed.</p>
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
- <span class="n">sprintf</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_459</span><span class="p">,</span><span class="s">"echo -n </span><span class="se">\'</span><span class="s">%s</span><span class="se">\'</span><span class="s">|md5sum"</span><span class="p">,</span><span class="n">local_48</span><span class="p">);</span>
-  <span class="n">local_10</span> <span class="o">=</span> <span class="n">popen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_459</span><span class="p">,</span><span class="s">"r"</span><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">local_10</span> <span class="o">==</span> <span class="p">(</span><span class="kt">FILE</span> <span class="o">*</span><span class="p">)</span><span class="mh">0x0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">puts</span><span class="p">(</span><span class="s">"Failed to run command"</span><span class="p">);</span>
-                    <span class="cm">/* WARNING: Subroutine does not return */</span>
-    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">fgets</span><span class="p">(</span><span class="n">local_458</span><span class="p">,</span><span class="mh">0x21</span><span class="p">,</span><span class="n">local_10</span><span class="p">);</span>
-  <span class="n">local_18</span> <span class="o">=</span> <span class="s">"3b9aafa12aceeccd29a154766194a964"</span><span class="p">;</span>
-  <span class="n">iVar1</span> <span class="o">=</span> <span class="n">memcmp</span><span class="p">(</span><span class="n">local_458</span><span class="p">,</span><span class="s">"3b9aafa12aceeccd29a154766194a964"</span><span class="p">,</span><span class="mh">0x20</span><span class="p">);</span>
-<span class="p">...</span>
-</code></pre></div></div>
-<p><br />
-However, if we print the hash itself using the <code class="highlighter-rouge">echo</code> command, it should work.
-<img src="images/uncrackable_4.png" alt="file missing" />
-<br /></p>
-
-<p>All we have to do is to connect to the original challenge server and redo what we have done and we should be able to get the flag.
-<br />
-Flag: <em>securinets{memcmp_turned_out_to_be_shame_shame_shame!!}</em> 
-<br />
-Thank you for reading!</p>
-
-
-
-    </main><footer>
-  
-</footer>
-</div>
-  </body>
-</html>
+:ET

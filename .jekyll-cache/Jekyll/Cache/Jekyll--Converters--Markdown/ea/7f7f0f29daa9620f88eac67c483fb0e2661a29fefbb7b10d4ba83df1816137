@@ -1,0 +1,9 @@
+I"�<h1 id="pwn-uncrackable---666-pts">[PWN] UNCRACKABLE - 666 pts.</h1>
+
+<p>We’re given this file:
+<img src="images/uncrackable_1.png" alt="file missing" />
+<br /></p>
+
+<p>Let’s analyze this with Ghidra:</p>
+
+:ET

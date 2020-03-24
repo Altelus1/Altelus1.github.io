@@ -61,7 +61,7 @@ We will be able to see the decompiled code now (You can get the full code [here]
 ```
 <br />
 ### Initializing values:
-```C
+```c
   iVar2 = FUN_0010080a(); // The function returns 0x15. Check the full code :D
   iVar3 = FUN_00100815(); // The function returns 0xfb. Check also.
   uVar5 = (ulong)local_118;
@@ -77,7 +77,7 @@ We will be able to see the decompiled code now (You can get the full code [here]
           (cVar1 - 0x16U & 0x3f)) * 0xc0fe;
 ```
 From the code above, we can tell the values of the variables. 
-```C
+```c
 iVar2 = 0x15;
 iVar3 = 0xfb;
 uVar5 = 0x74; //Part of the encrypted flag
@@ -87,14 +87,14 @@ cVar1 = 0x1e;
 lVar7 = 0 //0 Since ptrace returns 0 when it is not being debugged. To note: The second lVar7 is not calculated yet.
 ```
 After plugging in the values of the variables involved in the long expressions, we should be able to arrive at this expression:
-```C
+```c
 lVar7 =  ((long)(0x1e - 0x14) * (long)((((double)(int)0xd1) * (((double)0xfb * 29.00000000 + 58.00000000) * (double)(ulong)0x74 + 110.00000000) + 141.00000000) * (double)0x15 + 20.00000000) >> (0x1e - 0x16U & 0x3f)) * 0xc0fe;
 //Which has a final value
 lVar7 = 0x68eb87ba216
 ```
 <br />
 ### Getting and encryption of user input:
-```C
+```c
   printf("Give me the passcode:");
   if (lVar7 < 0) {
     lVar7 = lVar7 + 0xff;
@@ -113,7 +113,7 @@ lVar7 = 0x68eb87ba216
   }
 ```
 From the code above, the user input is being looped through and each character of user input is being XORed to the bytes of lVar7. The resulting byte is stored in another variable called auStack504. This is what XOR op looks like:
-```C
+```c
 // Let VAL = "USER INPUT" = 
 KEY = a2-7b-b8-8e-06-a2-7b-b8-8e-06
 XOR   |  |  |  |  |  |  |  |  |  |
