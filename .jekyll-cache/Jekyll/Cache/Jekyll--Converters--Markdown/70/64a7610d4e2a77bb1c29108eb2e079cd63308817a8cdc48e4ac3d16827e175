@@ -1,0 +1,130 @@
+I"	&<h1 id="reversing-static-eyeless---834-pts">[REVERSING] static EYELESS - 834 pts.</h1>
+
+<p>We’re given a file:</p>
+
+<p><img src="images/static_eyeless_1.png# big" alt="file missing" />
+<br />
+When the file is run, this is the output:
+<img src="images/static_eyeless_2.png# medium" alt="file missing" /></p>
+
+<p><br />
+Running it with gdb crashes the debugger since its header is corrupted:
+<img src="images/static_eyeless_3.png" alt="file missing" />
+But instead of fixing the file header, let’s use another method.</p>
+
+<p><br />
+Analyzing the ELF binary with Ghidra. After loading the binary and be analyzed by Ghidra, we check on the symbol tree, under “Functions” folder and select the address that is highlighted: (Address 0x100820)
+<img src="images/static_eyeless_4.png# medium" alt="file missing" />
+We will be able to see the decompiled code now (You can get the full code <a href="assoc_files/static_eyeless_1.c">here</a>). These are the interesting parts:</p>
+<h3 id="the-encrypted-flag">The encrypted flag:</h3>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">local_128</span><span class="p">.</span><span class="n">_0_4_</span> <span class="o">=</span> <span class="mh">0xd1</span><span class="p">;</span>
+  <span class="n">local_128</span><span class="p">.</span><span class="n">_4_4_</span> <span class="o">=</span> <span class="mh">0x1e</span><span class="p">;</span>
+  <span class="n">local_120</span> <span class="o">=</span> <span class="mh">0xdb</span><span class="p">;</span>
+  <span class="n">local_11c</span> <span class="o">=</span> <span class="mh">0xfb</span><span class="p">;</span>
+  <span class="n">local_118</span> <span class="o">=</span> <span class="mh">0x74</span><span class="p">;</span>
+  <span class="n">local_114</span> <span class="o">=</span> <span class="mh">0xcb</span><span class="p">;</span>
+  <span class="n">local_110</span> <span class="o">=</span> <span class="mh">0x15</span><span class="p">;</span>
+  <span class="n">local_10c</span> <span class="o">=</span> <span class="mh">0xdd</span><span class="p">;</span>
+  <span class="n">local_108</span> <span class="o">=</span> <span class="mh">0xfa</span><span class="p">;</span>
+  <span class="n">local_104</span> <span class="o">=</span> <span class="mh">0x75</span><span class="p">;</span>
+  <span class="n">local_100</span> <span class="o">=</span> <span class="mh">0xd9</span><span class="p">;</span>
+  <span class="n">local_fc</span> <span class="o">=</span> <span class="mh">0x4b</span><span class="p">;</span>
+  <span class="n">local_f8</span> <span class="o">=</span> <span class="mh">0xda</span><span class="p">;</span>
+  <span class="n">local_f4</span> <span class="o">=</span> <span class="mh">0xe8</span><span class="p">;</span>
+  <span class="n">local_f0</span> <span class="o">=</span> <span class="mh">0x73</span><span class="p">;</span>
+  <span class="n">local_ec</span> <span class="o">=</span> <span class="mh">0xd1</span><span class="p">;</span>
+  <span class="n">local_e8</span> <span class="o">=</span> <span class="mh">0x4f</span><span class="p">;</span>
+  <span class="n">local_e4</span> <span class="o">=</span> <span class="mh">0xcc</span><span class="p">;</span>
+  <span class="n">local_e0</span> <span class="o">=</span> <span class="mh">0xe7</span><span class="p">;</span>
+  <span class="n">local_dc</span> <span class="o">=</span> <span class="mh">0x36</span><span class="p">;</span>
+  <span class="n">local_d8</span> <span class="o">=</span> <span class="mh">0xcc</span><span class="p">;</span>
+  <span class="n">local_d4</span> <span class="o">=</span> <span class="mh">0x4e</span><span class="p">;</span>
+  <span class="n">local_d0</span> <span class="o">=</span> <span class="mh">0xe7</span><span class="p">;</span>
+  <span class="n">local_cc</span> <span class="o">=</span> <span class="mh">0xfc</span><span class="p">;</span>
+  <span class="n">local_c8</span> <span class="o">=</span> <span class="mh">0x36</span><span class="p">;</span>
+  <span class="n">local_c4</span> <span class="o">=</span> <span class="mh">0xc1</span><span class="p">;</span>
+  <span class="n">local_c0</span> <span class="o">=</span> <span class="mh">0x10</span><span class="p">;</span>
+  <span class="n">local_bc</span> <span class="o">=</span> <span class="mh">0x8d</span><span class="p">;</span>
+  <span class="n">local_b8</span> <span class="o">=</span> <span class="mh">0xaf</span><span class="p">;</span>
+  <span class="n">local_b4</span> <span class="o">=</span> <span class="mh">0x7b</span><span class="p">;</span>
+  <span class="n">local_b0</span> <span class="o">=</span> <span class="mh">0xa8</span><span class="p">;</span>
+</code></pre></div></div>
+<p><br /></p>
+<h3 id="initializing-values">Initializing values:</h3>
+<pre><code class="language-C">  iVar2 = FUN_0010080a(); // The function returns 0x15. Check the full code :D
+  iVar3 = FUN_00100815(); // The function returns 0xfb. Check also.
+  uVar5 = (ulong)local_118;
+  dVar9 = (double)(int)local_128; //To note: local_128 == local_128._0_4
+  iVar4 = local_128._4_4_ + -0x14;
+  cVar1 = (char)local_128._4_4_;
+  puts("Hello REVERSER!");
+  lVar7 = ptrace(PTRACE_TRACEME,0,0,0);
+  lVar7 = (long)((int)lVar7 + 1) *
+          ((long)iVar4 *
+           (long)((dVar9 * (((double)iVar3 * 29.00000000 + 58.00000000) * (double)uVar5 +
+                           110.00000000) + 141.00000000) * (double)iVar2 + 20.00000000) &gt;&gt;
+          (cVar1 - 0x16U &amp; 0x3f)) * 0xc0fe;
+</code></pre>
+<p>From the code above, we can tell the values of the variables.</p>
+<pre><code class="language-C">iVar2 = 0x15;
+iVar3 = 0xfb;
+uVar5 = 0x74; //Part of the encrypted flag
+dVar9 = 209.000; //Also part of the encrypted flag but turned into type double
+iVar4 = 0x1e - 0x14 = 0xa 
+cVar1 = 0x1e;
+lVar7 = 0 //0 Since ptrace returns 0 when it is not being debugged. To note: The second lVar7 is not calculated yet.
+</code></pre>
+<p>After plugging in the values of the variables involved in the long expressions, we should be able to arrive at this expression:</p>
+<pre><code class="language-C">lVar7 =  ((long)(0x1e - 0x14) * (long)((((double)(int)0xd1) * (((double)0xfb * 29.00000000 + 58.00000000) * (double)(ulong)0x74 + 110.00000000) + 141.00000000) * (double)0x15 + 20.00000000) &gt;&gt; (0x1e - 0x16U &amp; 0x3f)) * 0xc0fe;
+//Which has a final value
+lVar7 = 0x68eb87ba216
+</code></pre>
+<p><br /></p>
+<h3 id="getting-and-encryption-of-user-input">Getting and encryption of user input:</h3>
+<pre><code class="language-C">  printf("Give me the passcode:");
+  if (lVar7 &lt; 0) {
+    lVar7 = lVar7 + 0xff;
+  }
+  fgets(local_58,0x31,_DAT_00302010);
+  local_234 = 0;
+  local_238 = 0;
+  local_228 = lVar7 &gt;&gt; 8;
+  while (sVar6 = strlen(local_58), (ulong)(long)local_238 &lt; sVar6) {
+    if (local_228 == 0) {
+      local_228 = lVar7 &gt;&gt; 8;
+    }
+    auStack504[local_238] = (int)local_58[local_238] ^ (uint)local_228 &amp; 0xff;
+    local_228 = local_228 &gt;&gt; 8;
+    local_238 = local_238 + 1;
+  }
+</code></pre>
+<p>From the code above, the user input is being looped through and each character of user input is being XORed to the bytes of lVar7. The resulting byte is stored in another variable called auStack504. This is what XOR op looks like:</p>
+<pre><code class="language-C">// Let VAL = "USER INPUT" = 
+KEY = a2-7b-b8-8e-06-a2-7b-b8-8e-06
+XOR   |  |  |  |  |  |  |  |  |  |
+VAL = 55-53-45-52-20-49-4e-50-55-54
+</code></pre>
+<p>Notice that 0x16, the very first byte of lVar7, is not used since before XORing, lVar7 is shifted 8 bits to the right. 
+<br />
+Since we already know how the user input is encrypted, let’s decrypt the encrypted flag.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">key</span> <span class="o">=</span> <span class="mh">0x68eb87ba216</span>
+<span class="n">contents</span> <span class="o">=</span> <span class="s">"d11edbfb74cb15ddfa75d94bdae873d14fcce736cc4ee7fc36c1108daf7ba8"</span>
+
+<span class="n">decr_char</span> <span class="o">=</span> <span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
+
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+	<span class="k">if</span> <span class="n">decr_char</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="n">decr_char</span> <span class="o">=</span> <span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
+
+	<span class="n">char</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s">"0x"</span><span class="o">+</span><span class="n">item</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+	<span class="n">char</span> <span class="o">=</span> <span class="n">char</span> <span class="o">^</span> <span class="p">(</span><span class="n">decr_char</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">)</span>
+	<span class="k">print</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="n">char</span><span class="p">),</span><span class="n">end</span><span class="o">=</span><span class="s">""</span><span class="p">)</span>
+
+	<span class="n">decr_char</span> <span class="o">=</span> <span class="n">decr_char</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">""</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>And Viola! We got the flag
+<img src="images/static_eyeless_6.png# medium" alt="file missing" /></p>
+:ET

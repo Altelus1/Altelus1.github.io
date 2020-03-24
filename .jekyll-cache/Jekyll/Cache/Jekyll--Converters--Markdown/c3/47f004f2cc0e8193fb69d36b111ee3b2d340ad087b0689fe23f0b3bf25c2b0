@@ -1,0 +1,14 @@
+I"Ì<h1 id="reversing-static-eyeless---834-pts">[REVERSING] static EYELESS - 834 pts.</h1>
+
+<p>Weâ€™re given a file:</p>
+
+<p><img src="images/static_eyeless_1.png# big" alt="file missing" />
+<br />
+When the file is run, this is the output:
+<img src="images/static_eyeless_2.png# big" alt="file missing" /></p>
+
+<p><br />
+Running it with gdb crashes the debugger since its header is corrupted:
+<img src="images/static_eyeless_2.png# big" alt="file missing" /></p>
+
+:ET

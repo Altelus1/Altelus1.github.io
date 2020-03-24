@@ -48,6 +48,8 @@ img[src~="medium"] { max-width: 500px; max-height: 300px; }
 
 img[src~="big"] { max-width: 700px; max-height: 500px; }
 
+img[src~="small"] { max-width: 300px; max-height: 100px; }
+
 /** Highlight/Markup */
 ::selection { background: var(--selection-background); color: var(--selection-text); }
 
