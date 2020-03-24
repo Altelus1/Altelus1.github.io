@@ -49,6 +49,9 @@ img[src~="icon"]{max-width: 300px; max-height: 100px}
 img[src~="medium"]{max-width: 500px; max-height: 300px}
 img[src~="big"]{max-width: 700px; max-height: 500px}
 img[src~="small"]{max-width: 300px; max-height: 100px}
+img[src~="small-p"]{max-width: 100px; max-height: 300px}
+img[src~="medium-p"]{max-width: 300px; max-height: 500px}
+img[src~="big-p"]{max-width: 500px; max-height: 700px}
 /**
  * Highlight/Markup
  */

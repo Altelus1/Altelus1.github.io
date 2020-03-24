@@ -1,9 +1,0 @@
-I"´<h1 id="reversing-static-eyeless---834-pts">[REVERSING] static EYELESS - 834 pts.</h1>
-
-<p>Weâ€™re given a file:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>task: ELF 64-bit LSB shared object, x86-64, version 1 <span class="o">(</span>SYSV<span class="o">)</span>, dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, missing section headers
-
-</code></pre></div></div>
-
-:ET

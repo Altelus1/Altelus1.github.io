@@ -1,0 +1,10 @@
+I"Æ<h1 id="reversing-kavm---985-pts">[REVERSING] KAVM - 985 pts.</h1>
+
+<p><br />
+Weâ€™re given a file:
+<img src="images/kavm_1.png# big" alt="file missing" />
+<br /></p>
+
+<p>Checking it with gdb:</p>
+
+:ET

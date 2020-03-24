@@ -1,0 +1,38 @@
+I"$<h1 id="reversing-kavm---985-pts">[REVERSING] KAVM - 985 pts.</h1>
+
+<p><br />
+We’re given a file:
+<img src="images/kavm_1.png# big" alt="file missing" />
+<br /></p>
+
+<p>And when we run it, it asks for magic password:
+<img src="images/kavm_7.png# medium" alt="file missing" />
+<br /></p>
+
+<p>Checking it with gdb:
+<img src="images/kavm_2.png# big-p" alt="file missing" />
+The symbol table only contains plt entries.
+Before digging in GDB, let’s analyze the binary with Ghidra.
+<br /></p>
+
+<p>After Ghidra was able to analyze the file, we’re able to find the main function:
+<img src="images/kavm_3.png# medium-p" alt="file missing" />
+<br /></p>
+
+<p>But upon looking at GDB, we can see that there are is one more address called: 0x8048440 but we can ignore since what it does is only get the next instruction address and store it at ebx.
+<img src="images/kavm_4.png# small" alt="file missing" />
+<br /></p>
+
+<p>However, what’s interesting is the result of ebx when added to 0x2ae6. Let’s run and set breakpoint at address 0x8048520:
+<img src="images/kavm_5.png# medium" alt="file missing" />
+As we can see from above image, the value of EBX = 0x804b000. Let’s check the byte contents.
+<br /></p>
+
+<p>Here is the byte contents from address0x804b000:
+<img src="images/kavm_6.png# big" alt="file missing" /></p>
+
+<p>Interesting! Some of the values lying around at different addresses looks like are printable bytes! It looks like for the VM this is where its <em>data segment</em> starts. Let’s check the values:</p>
+<pre><code class="language-C">
+</code></pre>
+
+:ET
