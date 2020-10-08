@@ -5,6 +5,7 @@ type: htb_box
 layout: page
 img-link: images/json/json_1.png
 desc: 10.10.10.158 - [MEDIUM] Json by Altelus
+tags: Json writeup hackthebox
 ---
 
 
