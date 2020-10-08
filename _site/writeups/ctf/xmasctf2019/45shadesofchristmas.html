@@ -12,13 +12,13 @@
     <meta property="og:image" content="/writeups/ctf/xmasctf2019/images/45shadesofchristmas_1.png">
     <meta property="og:description" content="Miscellaneousa 280 Pts">
     <title>45 Shades of Christmas</title><!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
+<meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="45 Shades of Christmas" />
 <meta property="og:locale" content="en_US" />
 <link rel="canonical" href="http://localhost:4000/writeups/ctf/xmasctf2019/45shadesofchristmas.html" />
 <meta property="og:url" content="http://localhost:4000/writeups/ctf/xmasctf2019/45shadesofchristmas.html" />
 <script type="application/ld+json">
-{"url":"http://localhost:4000/writeups/ctf/xmasctf2019/45shadesofchristmas.html","@type":"WebPage","headline":"45 Shades of Christmas","@context":"https://schema.org"}</script>
+{"@type":"WebPage","url":"http://localhost:4000/writeups/ctf/xmasctf2019/45shadesofchristmas.html","headline":"45 Shades of Christmas","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
 
@@ -44,18 +44,18 @@
 I used PIL python module.</p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="nb">open</span><span class="p">(</span><span class="s">'grey.bmp'</span><span class="p">)</span>
-<span class="n">pix</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">load</span><span class="p">()</span></code></pre></figure>
+<span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="s">'grey.bmp'</span><span class="p">)</span>
+<span class="n">pix</span> <span class="o">=</span> <span class="n">img</span><span class="p">.</span><span class="n">load</span><span class="p">()</span></code></pre></figure>
 
 <p><br />
 Now, let’s see the values of the pixels of if there are anything unusual to them.</p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">pixels</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+<span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="p">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
   <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
-  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pix</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">])</span>
-  <span class="n">pixels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> </code></pre></figure>
+  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="p">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="n">row</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">pix</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">])</span>
+  <span class="n">pixels</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> </code></pre></figure>
 
 <p><br />
 Let’s look at first row and the second row:</p>
@@ -89,11 +89,11 @@ Decoding:
 Huh? What? Is it encrypted? Let’s see, looks like a ROT or substitution cipher but before doing any cryptanalysis, let’s try another method. Instead of going to x then y pixel, we do y then x pixel.</p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">pixels</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="p">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
   <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
-  <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pix</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">])</span>
-  <span class="n">pixels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> </code></pre></figure>
+  <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="p">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="n">row</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">pix</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">])</span>
+  <span class="n">pixels</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> </code></pre></figure>
 
 <p><br />
 Output:

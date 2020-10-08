@@ -1,0 +1,22 @@
+I"`<h1 id="binary-binary-ultra---50-pts">[BINARY] Binary Ultra - 50 Pts.</h1>
+<p><br />
+We’re given with this file.</p>
+
+<p><img src="images/b_ultra_1.png" alt="lol it didn't load" />
+<br />
+We did the following and it turned out it is a program for Windows 64 bit.</p>
+
+<p><img src="images/b_ultra_2.png" alt="lol it didn't load" />
+<br /></p>
+
+<p>Let’s check if the flag string is embedded as is in the PE.
+If not, we’ll have to do static analysis and dynamic analysis
+later.
+<img src="images/b_ultra_3.png" alt="lol it didn't load" /></p>
+
+<p>LOL!!! It did!
+<br />
+:D :D :D
+Thank you for reading!</p>
+
+:ET

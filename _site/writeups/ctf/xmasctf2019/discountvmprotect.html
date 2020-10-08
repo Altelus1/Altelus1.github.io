@@ -12,13 +12,13 @@
     <meta property="og:image" content="/writeups/ctf/xmasctf2019/images/discountvmprotect_1.png">
     <meta property="og:description" content="Reverse Engineering 465 Pts.">
     <title>Discount VMProtect</title><!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
+<meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="Discount VMProtect" />
 <meta property="og:locale" content="en_US" />
 <link rel="canonical" href="http://localhost:4000/writeups/ctf/xmasctf2019/discountvmprotect.html" />
 <meta property="og:url" content="http://localhost:4000/writeups/ctf/xmasctf2019/discountvmprotect.html" />
 <script type="application/ld+json">
-{"url":"http://localhost:4000/writeups/ctf/xmasctf2019/discountvmprotect.html","@type":"WebPage","headline":"Discount VMProtect","@context":"https://schema.org"}</script>
+{"@type":"WebPage","url":"http://localhost:4000/writeups/ctf/xmasctf2019/discountvmprotect.html","headline":"Discount VMProtect","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
 
@@ -48,12 +48,12 @@ Let’s see what the ELF file does.
 <p>It basically asks for a password then checks if it matches to the password embedded inside the executable, which is also probably the flag.</p>
 
 <p><br />
-Let’s run gdb on it and do static analysis. Let’s check for functions and how much symbols is left since the <code class="highlighter-rouge">file</code> command says it is stripped.</p>
+Let’s run gdb on it and do static analysis. Let’s check for functions and how much symbols is left since the <code class="language-plaintext highlighter-rouge">file</code> command says it is stripped.</p>
 
 <p><img src="images/discountvmprotect_4.png" alt="lol it didn't load" />
 Hmmm… There is no main and only plt entries remained. Let’s find the entry point and the main then.
 <br />
-The entry point is at <code class="highlighter-rouge">0x400770</code>.
+The entry point is at <code class="language-plaintext highlighter-rouge">0x400770</code>.
 <img src="images/discountvmprotect_5.png" alt="lol it didn't load" /></p>
 
 <p><br />
@@ -262,20 +262,20 @@ Finally, let’s answer (c). Where is the flag?</p>
 <span class="mf">5.</span>  <span class="mi">64</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">80</span>
 <span class="mf">7.</span>  <span class="mi">33</span>
 <span class="mf">8.</span>  <span class="mi">34</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">12</span>
-<span class="n">a</span><span class="o">.</span>  <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">c</span><span class="o">.</span>  <span class="mi">38</span>
-<span class="n">d</span><span class="o">.</span>  <span class="mi">32</span>
-<span class="n">e</span><span class="o">.</span>  <span class="mi">32</span>
-<span class="n">f</span><span class="o">.</span>  <span class="mi">39</span>
+<span class="n">a</span><span class="p">.</span>  <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">c</span><span class="p">.</span>  <span class="mi">38</span>
+<span class="n">d</span><span class="p">.</span>  <span class="mi">32</span>
+<span class="n">e</span><span class="p">.</span>  <span class="mi">32</span>
+<span class="n">f</span><span class="p">.</span>  <span class="mi">39</span>
 <span class="mf">10.</span> <span class="mi">34</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="mf">12.</span> <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">23</span>
 <span class="mf">14.</span> <span class="mi">39</span>
 <span class="mf">15.</span> <span class="mi">34</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">1</span><span class="n">b</span>
 <span class="mf">17.</span> <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="mf">19.</span> <span class="mi">64</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="mi">1</span><span class="n">b</span><span class="o">.</span> <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="mi">1</span><span class="n">d</span><span class="o">.</span> <span class="mi">64</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">80</span>
-<span class="mi">1</span><span class="n">f</span><span class="o">.</span> <span class="mi">30</span> </code></pre></figure>
+<span class="mi">1</span><span class="n">b</span><span class="p">.</span> <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="mi">1</span><span class="n">d</span><span class="p">.</span> <span class="mi">64</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">80</span>
+<span class="mi">1</span><span class="n">f</span><span class="p">.</span> <span class="mi">30</span> </code></pre></figure>
 
 <p>Instructions 0-2:</p>
 <ul>
@@ -314,10 +314,10 @@ Nevertheless, we were able to grasp the execution for the first time. Let’s go
 <span class="mf">6.</span>  <span class="mi">33</span>
 <span class="mf">7.</span>  <span class="mi">32</span>
 <span class="mf">8.</span>  <span class="mi">34</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">28</span> <span class="c1">#This jumps directly to opcode 30 -&gt; exit instruction
-</span><span class="n">a</span><span class="o">.</span>  <span class="mi">35</span>
-<span class="n">b</span><span class="o">.</span>  <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">63</span>
-<span class="n">d</span><span class="o">.</span>  <span class="mi">37</span>
-<span class="n">e</span><span class="o">.</span>  <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">98</span>
+</span><span class="n">a</span><span class="p">.</span>  <span class="mi">35</span>
+<span class="n">b</span><span class="p">.</span>  <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">63</span>
+<span class="n">d</span><span class="p">.</span>  <span class="mi">37</span>
+<span class="n">e</span><span class="p">.</span>  <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">98</span>
 <span class="mf">10.</span> <span class="mi">38</span>
 <span class="mf">11.</span> <span class="mi">61</span>
 <span class="mf">12.</span> <span class="mi">62</span>
@@ -326,9 +326,9 @@ Nevertheless, we were able to grasp the execution for the first time. Let’s go
 <span class="mf">17.</span> <span class="mi">38</span>
 <span class="mf">18.</span> <span class="mi">65</span>
 <span class="mf">19.</span> <span class="mi">39</span>
-<span class="mi">1</span><span class="n">a</span><span class="o">.</span> <span class="mi">34</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="mi">1</span><span class="n">c</span><span class="o">.</span> <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="mi">1</span><span class="n">e</span><span class="o">.</span> <span class="mi">64</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="mi">1</span><span class="n">a</span><span class="p">.</span> <span class="mi">34</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="mi">1</span><span class="n">c</span><span class="p">.</span> <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="mi">1</span><span class="n">e</span><span class="p">.</span> <span class="mi">64</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="mf">20.</span> <span class="mi">36</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="mf">22.</span> <span class="mi">38</span>
 <span class="mf">23.</span> <span class="mi">32</span>

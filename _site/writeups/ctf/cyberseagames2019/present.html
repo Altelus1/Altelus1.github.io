@@ -12,13 +12,13 @@
     <meta property="og:image" content="/writeups/ctf/cyberseagames2019/images/present_1.png">
     <meta property="og:description" content="Binary 100 Pts.">
     <title>Present</title><!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
+<meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="Present" />
 <meta property="og:locale" content="en_US" />
 <link rel="canonical" href="http://localhost:4000/writeups/ctf/cyberseagames2019/present.html" />
 <meta property="og:url" content="http://localhost:4000/writeups/ctf/cyberseagames2019/present.html" />
 <script type="application/ld+json">
-{"url":"http://localhost:4000/writeups/ctf/cyberseagames2019/present.html","@type":"WebPage","headline":"Present","@context":"https://schema.org"}</script>
+{"@type":"WebPage","url":"http://localhost:4000/writeups/ctf/cyberseagames2019/present.html","headline":"Present","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
 
@@ -74,13 +74,13 @@ In the image below, we can see there are two mains:</p>
 
 <p>Let’s see what</p>
 
-<p><code class="highlighter-rouge">sym.__main</code></p>
+<p><code class="language-plaintext highlighter-rouge">sym.__main</code></p>
 
 <p>does… It looks like it only goes to the .ctors of the binary</p>
 
 <p><img src="images/present_9.png" alt="lol it didn't load" /></p>
 
-<p>Let’s check <code class="highlighter-rouge">sym._main</code>… There’s an interesting string that’s encoded in base64</p>
+<p>Let’s check <code class="language-plaintext highlighter-rouge">sym._main</code>… There’s an interesting string that’s encoded in base64</p>
 
 <p><img src="images/present_10.png" alt="lol it didn't load" /></p>
 

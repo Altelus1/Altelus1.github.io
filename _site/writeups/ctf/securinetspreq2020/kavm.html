@@ -12,13 +12,13 @@
     <meta property="og:image" content="/writeups/ctf/securinetspreq2020/images/kavm_1.png">
     <meta property="og:description" content="Reverse Engineering 985 pts.">
     <title>KAVM</title><!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
+<meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="KAVM" />
 <meta property="og:locale" content="en_US" />
 <link rel="canonical" href="http://localhost:4000/writeups/ctf/securinetspreq2020/kavm.html" />
 <meta property="og:url" content="http://localhost:4000/writeups/ctf/securinetspreq2020/kavm.html" />
 <script type="application/ld+json">
-{"url":"http://localhost:4000/writeups/ctf/securinetspreq2020/kavm.html","@type":"WebPage","headline":"KAVM","@context":"https://schema.org"}</script>
+{"@type":"WebPage","url":"http://localhost:4000/writeups/ctf/securinetspreq2020/kavm.html","headline":"KAVM","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
 
@@ -115,10 +115,10 @@ Since scanf is used for getting the user input, the second value in the stack is
 <img src="images/kavm_11.png# small" alt="file missing" />. 
 <br /></p>
 <h3 id="minor-problem">Minor problem</h3>
-<p>However, our input seems not to be encrypted. We can know this by setting our breakpoint again to 0x80485a5 and by checking our string input <code class="highlighter-rouge">x/s 0x804b240</code> every time it hits our breakpoint. “No…” is printed but there are no changes to our input. 
+<p>However, our input seems not to be encrypted. We can know this by setting our breakpoint again to 0x80485a5 and by checking our string input <code class="language-plaintext highlighter-rouge">x/s 0x804b240</code> every time it hits our breakpoint. “No…” is printed but there are no changes to our input. 
 <img src="images/kavm_13.png# medium-p" alt="file missing" />
 <br />
-When we rerun our program again with the same breakpoint and still checking our input, at some point the program jumps to address 0x804894e which has <code class="highlighter-rouge">strlen()</code> in it. It probably requires a certain length for our input.
+When we rerun our program again with the same breakpoint and still checking our input, at some point the program jumps to address 0x804894e which has <code class="language-plaintext highlighter-rouge">strlen()</code> in it. It probably requires a certain length for our input.
 <img src="images/kavm_12.png# medium-p" alt="file missing" />
 <br />
 Let’s go check the most interesting string’s length.</p>
@@ -175,7 +175,7 @@ And this changed happened when <strong>after</strong> we jumped to address 0x804
    <span class="mh">0x8048ba3</span><span class="o">:</span>	<span class="n">jmp</span>    <span class="mh">0x8048cb9</span>
 </code></pre></div></div>
 <p>However, what interests us is an instruction that saves 1 byte to to an address. This assumption was made since a transformed byte must be saved to our input address and the only instruction that does that is at address 0x8048ba1. Now, we have to find an instruction before it that does an arithmetic/bit operation (xor, sub, and, add etc.) and it s the instruction at 0x8048b9d. Let’s delete all of our breakpoints and set a new breakpoint to 0x8048b9d to see the value of ECX and EBX. Let’s now rerun the program.</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#By checking the registers every time it hits the breakpoint here are the values
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#By checking the registers every time it hits the breakpoint here are the values
 1 ----
 EBX: 0x20 (' ')
 ECX: 0x61 ('a')

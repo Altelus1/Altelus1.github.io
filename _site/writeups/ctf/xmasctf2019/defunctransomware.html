@@ -12,13 +12,13 @@
     <meta property="og:image" content="/writeups/ctf/xmasctf2019/images/defunctransomware_1.png">
     <meta property="og:description" content="Cryptography 50 Pts.">
     <title>DeFUNct Ransomware</title><!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
+<meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="DeFUNct Ransomware" />
 <meta property="og:locale" content="en_US" />
 <link rel="canonical" href="http://localhost:4000/writeups/ctf/xmasctf2019/defunctransomware.html" />
 <meta property="og:url" content="http://localhost:4000/writeups/ctf/xmasctf2019/defunctransomware.html" />
 <script type="application/ld+json">
-{"url":"http://localhost:4000/writeups/ctf/xmasctf2019/defunctransomware.html","@type":"WebPage","headline":"DeFUNct Ransomware","@context":"https://schema.org"}</script>
+{"@type":"WebPage","url":"http://localhost:4000/writeups/ctf/xmasctf2019/defunctransomware.html","headline":"DeFUNct Ransomware","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
 
@@ -61,7 +61,7 @@ euler_tot = 79556946364268554050750358071753198221567986615644875818187486429432
 <br />
 decrypt_key = modinv(e, euler_tot) = 97947443900524080191446418200358964894514983896595100917345619492485351014389010789773809219193783476885894363853986839609634323382094519020045017872183892389199029691695425209960304681655760875600420216555449611351057322449998167403127238784464235940520723908120900740270593708738216059614921653939858820884570784133348078569567408195409942197024357650215243834952970787234564579228696916327118249282619782509563249974433386635864110475706385437679778847626962613679407222981079161367874254774380669773556113596975833849765492081560428806779995911549969370859406030380441549344595800788002719550696181409025832199872837747135601303973069391407073831392878046636924273364167788348975547748266210646095491571088300505759549576117346943062604622258200178886908155195598496187856561008219352702078288430556428239639338779175180953310520039842761612618360251012177164137360557331509685869582782421599486453168672995255112754229040993031774366604253249979366988203302275085602294754186912098713790531166873053644862314045105253694994187994721761839377636465577626666568155763150460347189523338307711960573939225206219655060079369394286413391401284211818353269597162262100913482480941739344161165063870167524617918897779369420501512993545</p>
 
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">original_message</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">memos</span><span class="o">.</span><span class="n">enc</span><span class="p">,</span> <span class="n">decrypt_key</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">original_message</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">memos</span><span class="p">.</span><span class="n">enc</span><span class="p">,</span> <span class="n">decrypt_key</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></code></pre></figure>
 
 <p><br />
 Original Message:

