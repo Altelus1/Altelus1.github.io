@@ -1,0 +1,156 @@
+I"j+<h1 id="cache-">Cache <br /></h1>
+
+<p><img src="images/cache/1.png# icon" alt="Cache icon" /></p>
+
+<h2 id="enumeration">Enumeration</h2>
+
+<h3 id="nmap">Nmap</h3>
+
+<p>Started with the following nmap command:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nmap <span class="nt">-sV</span> <span class="nt">-sC</span> <span class="nt">-p</span> 1-10000 <span class="nt">-oA</span> nmap.res <span class="nt">-v</span> cache.htb
+</code></pre></div></div>
+<p><br />This is the nmap result.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Nmap scan report <span class="k">for </span>cache.htb <span class="o">(</span>10.10.10.188<span class="o">)</span>
+Host is up <span class="o">(</span>0.28s latency<span class="o">)</span><span class="nb">.</span>
+Not shown: 9998 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 <span class="o">(</span>Ubuntu Linux<span class="p">;</span> protocol 2.0<span class="o">)</span>
+| ssh-hostkey: 
+|   2048 a9:2d:b2:a0:c4:57:e7:7c:35:2d:45:4d:db:80:8c:f1 <span class="o">(</span>RSA<span class="o">)</span>
+|   256 bc:e4:16:3d:2a:59:a1:3a:6a:09:28:dd:36:10:38:08 <span class="o">(</span>ECDSA<span class="o">)</span>
+|_  256 57:d5:47:ee:07:ca:3a:c0:fd:9b:a8:7f:6b:4c:9d:7c <span class="o">(</span>ED25519<span class="o">)</span>
+80/tcp open  http    Apache httpd 2.4.29 <span class="o">((</span>Ubuntu<span class="o">))</span>
+| http-methods: 
+|_  Supported Methods: HEAD GET POST OPTIONS
+|_http-server-header: Apache/2.4.29 <span class="o">(</span>Ubuntu<span class="o">)</span>
+|_http-title: Cache
+Service Info: OS: Linux<span class="p">;</span> CPE: cpe:/o:linux:linux_kernel
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ <span class="nb">.</span>
+<span class="c"># Nmap done at Fri Sep 25 23:40:04 2020 -- 1 IP address (1 host up) scanned in 226.08 seconds</span>
+</code></pre></div></div>
+<p><br />An <strong>ssh server</strong> and a <strong>web server</strong> is open. Let’s check the webpage first.</p>
+
+<h3 id="web-pages-enumeration">Web Pages Enumeration</h3>
+
+<p>By going to the homepage, here is the presented web page.<br />
+<img src="images/cache/2.png" alt="Cache homepage" /></p>
+
+<p><br />There are a couple of links in here but we are interested these two:<br />
+<img src="images/cache/3.png# medium" alt="Two links" /></p>
+
+<h4 id="login-page">Login Page</h4>
+<p>Let’s check the <code class="language-plaintext highlighter-rouge">/login.html</code>. Upon visting the page, we are prompted for username and password.<br />
+<img src="images/cache/4.png# medium" alt="Login page html" /></p>
+
+<p><br />At this point, we don’t have any credentials yet so let’s check first the page’s source code to check anything that may be useful.<br />
+<img src="images/cache/5.png# big" alt="Login page html source" /></p>
+
+<p><br />The page source code has shown some important things:</p>
+<ul>
+  <li>It revealed that there is a user defined javascript file, named <code class="language-plaintext highlighter-rouge">functionality.js</code> that might be handling the login action.</li>
+  <li>It also revealed that we can bypass the login form by accessing <code class="language-plaintext highlighter-rouge">net.html</code> directly.</li>
+</ul>
+
+<p><br />With these in mind, let’s check first the javascript file.</p>
+
+<h4 id="javascript-hardcoded-username-and-password">Javascript Hardcoded Username and Password</h4>
+<p>Upong checking the javascript file, there is a hardcoded username and password.
+<br /></p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* /jquery/functinality.js */</span>
+<span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+    
+    <span class="kd">var</span> <span class="nx">error_correctPassword</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">error_username</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    
+    <span class="kd">function</span> <span class="nx">checkCorrectPassword</span><span class="p">(){</span>
+        <span class="kd">var</span> <span class="nx">Password</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">#password</span><span class="dl">"</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">Password</span> <span class="o">!=</span> <span class="dl">'</span><span class="s1">H@v3_fun</span><span class="dl">'</span><span class="p">){</span>
+            <span class="nx">alert</span><span class="p">(</span><span class="dl">"</span><span class="s2">Password didn't Match</span><span class="dl">"</span><span class="p">);</span>
+            <span class="nx">error_correctPassword</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">checkCorrectUsername</span><span class="p">(){</span>
+        <span class="kd">var</span> <span class="nx">Username</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">#username</span><span class="dl">"</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">Username</span> <span class="o">!=</span> <span class="dl">"</span><span class="s2">ash</span><span class="dl">"</span><span class="p">){</span>
+            <span class="nx">alert</span><span class="p">(</span><span class="dl">"</span><span class="s2">Username didn't Match</span><span class="dl">"</span><span class="p">);</span>
+            <span class="nx">error_username</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">#loginform</span><span class="dl">"</span><span class="p">).</span><span class="nx">submit</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* Act on the event */</span>
+        <span class="nx">error_correctPassword</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+         <span class="nx">checkCorrectPassword</span><span class="p">();</span>
+         <span class="nx">error_username</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+         <span class="nx">checkCorrectUsername</span><span class="p">();</span>
+
+
+        <span class="k">if</span><span class="p">(</span><span class="nx">error_correctPassword</span> <span class="o">==</span> <span class="kc">false</span> <span class="o">&amp;&amp;</span> <span class="nx">error_username</span> <span class="o">==</span><span class="kc">false</span><span class="p">){</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">else</span><span class="p">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+    
+<span class="p">});</span>
+</code></pre></div></div>
+<p><br />From the code above we can extract the <strong><code class="language-plaintext highlighter-rouge">ash:H@v3_fun</code></strong> credential. Let’s try logging in.<br />
+After successful login, this is the <strong><code class="language-plaintext highlighter-rouge">net.html</code></strong> page.<br />
+<img src="images/cache/6.png# medium" alt="net.html page" /></p>
+
+<p><br />However, there is nothing more to this page. We just have to hold on to those credentials that we have acquired. Thus, bypassing the login page will also become pointless since there is nothing useful even if we actually accessed <strong><code class="language-plaintext highlighter-rouge">net.html</code></strong> without the credentials.<br />
+Let’s now Move to the other important link, the <strong><em>author.html (Author’s Page)</em></strong></p>
+<h4 id="authors-page">Author’s Page</h4>
+<p>This is the author’s page<br />
+<img src="images/cache/7.png# medium-p" alt="Author's page" />
+<br />One very important note to take here is that the author has another project which is the “Hostpital Management System” or HMS. This might pertain that there is another virtual servre being hosted. We can add another domain name in our <strong><code class="language-plaintext highlighter-rouge">/etc/hosts</code></strong> for easy resolution to the domain when accessing through the web browser.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+10.10.10.188	cache.htb hms.cache.htb hms.htb cache.hms.htb
+...
+</code></pre></div></div>
+<p><br />We added a few combinations just to have a few more options.</p>
+
+<h2 id="openemr">OpenEMR</h2>
+
+<p>Let’s now access <strong><code class="language-plaintext highlighter-rouge">http://hms.htb</code></strong>. We</p>
+
+<h3 id="openemr-vulnerability-1-patient-portal-authentication-bypass">OpenEMR Vulnerability 1: Patient Portal Authentication Bypass</h3>
+
+<h3 id="openemr-vulnerability-2-sql-injection-against-portalfind_appt_popup_userphp">OpenEMR Vulnerability 2: SQL Injection Against /portal/find_appt_popup_user.php</h3>
+
+<h4 id="leaking-administrator-password-hash">Leaking Administrator Password Hash</h4>
+
+<h4 id="cracking-administrator-bcrypt-hash-w-hashcat">Cracking Administrator Bcrypt Hash W/ Hashcat</h4>
+
+<h3 id="openemr-vulnerability-3-authenticated-rce-via-file-upload-portalimport_templatephp">OpenEMR Vulnerability 3: Authenticated RCE via File Upload /portal/import_template.php</h3>
+
+<h2 id="privesc-enumeration-as-www-data">Privesc Enumeration as www-data</h2>
+
+<h3 id="checking-etcpasswd">Checking /etc/passwd</h3>
+
+<h2 id="escalate-to-user-ash">Escalate to User Ash</h2>
+
+<h2 id="privesc-enumeration-as-ash">Privesc Enumeration as Ash</h2>
+
+<h3 id="netstat">Netstat</h3>
+
+<h3 id="connecting-and-dumping-memcached-contents">Connecting and Dumping Memcached Contents</h3>
+
+<h2 id="escalate-to-user-luffy">Escalate to User Luffy</h2>
+
+<h2 id="privesc-enumeration-as-luffy">Privesc Enumeration as Luffy</h2>
+
+<h3 id="id">ID</h3>
+
+<h3 id="available-container---ubuntu-container">Available Container - Ubuntu Container</h3>
+
+<h2 id="escalate-to-root">Escalate to Root</h2>
+
+<h3 id="gtfobins---docker">GTFOBins - Docker</h3>
+
+:ET

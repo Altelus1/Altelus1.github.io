@@ -4,10 +4,9 @@
 
 /** Style variables */
 /** Global */
-body { background-color: var(--background-color); margin: 0 auto; padding: 0; font-family: "Source Code Pro", monospace; font-size: 1em; color: var(--text-color); text-align: left; line-height: 1.5 !important; }
+body { background-color: var(--background-color); margin: 0 auto; padding: 0; font-family: "Source Code Pro", monospace; font-size: 1em; color: var(--text-color); text-align: left; line-height: 1.2 !important; }
 
-h4, h5, h6 { font-size: 1em; margin: 0px; margin-top: 22px; font-weight: bold; color: var(--text-color); }
-
+/*h4, h5, h6 { font-size: $base-font-size;  margin: 0px;  margin-top: 22px;  font-weight: bold;  color: var(--text-color);*/
 p, ul, ol { margin: 0px; color: var(--text-color); }
 
 a { text-decoration: underline; color: var(--link-color); }
@@ -18,12 +17,18 @@ a:hover { color: var(--background-color); background-color: var(--base-color); }
 
 @media only screen and (max-device-width: 500px) { * { font-size: 12px !important; } }
 
-/*h1:before { content: "#";  margin-right: 9px; }
-h2:before { content: "##";  margin-right: 9px; }
-h3:before { content: "###";  margin-right: 9px; }
-h4:before { content: "####";  margin-right: 9px; }
-h5:before { content: "#####";  margin-right: 9px; }
-h6:before { content: "######";  margin-right: 9px; }*/
+h1 { font-size: 40px; }
+
+h2 { font-size: 35px; }
+
+h3 { font-size: 30px; }
+
+h4 { font-size: 25px; }
+
+h5 { font-size: 20px; }
+
+h6 { font-size: 15px; }
+
 /** Layout */
 .container { width: 70%; max-width: 900px; margin-right: auto; margin-left: auto; }
 
@@ -82,7 +87,7 @@ img[src~="big-p"] { max-width: 500px; max-height: 700px; }
 /** Form */
 input, select, textarea { padding: 0; margin: 0; -webkit-appearance: none; -webkit-border-radius: 0; border: none; }
 
-input[type=text], select, textarea { width: 100%; resize: none; background-color: var(--background-color); color: var(--text-color); caret-color: var(--text-color); font-size: 1em; font-family: "Source Code Pro", monospace; line-height: 1.5; }
+input[type=text], select, textarea { width: 100%; resize: none; background-color: var(--background-color); color: var(--text-color); caret-color: var(--text-color); font-size: 1em; font-family: "Source Code Pro", monospace; line-height: 1.2; }
 
 input, select, textarea, textarea::-webkit-input-placeholder { text-indent: 0px; }
 
@@ -92,7 +97,7 @@ input, select, textarea, textarea::-webkit-input-placeholder { text-indent: 0px;
 
 ::-ms-input-placeholder { color: var(--placeholder-color); }
 
-input[type=submit] { font-size: 1em; font-family: "Source Code Pro", monospace; line-height: 1.5; cursor: pointer; color: var(--link-color); background-color: var(--background-color); }
+input[type=submit] { font-size: 1em; font-family: "Source Code Pro", monospace; line-height: 1.2; cursor: pointer; color: var(--link-color); background-color: var(--background-color); }
 
 input[type=submit]:hover { color: var(--background-color); background-color: var(--base-color); }
 
@@ -105,7 +110,7 @@ textarea { vertical-align: top; }
 
 figure.highlight { margin: 5px 0; }
 
-pre { background-color: #212121; border: none; padding: 0; margin: 0; overflow: auto; font-size: 1em; color: var(--text-color); line-height: 1.7 !important; font-family: "Source Code Pro", monospace !important; }
+pre { background-color: #212121; border: none; padding: 0; margin: 0; overflow: auto; font-size: 1em; color: var(--text-color); line-height: 1 !important; font-family: "Source Code Pro", monospace !important; }
 
 .highlight .hll { background-color: var(--code-color-2); }
 

@@ -5,31 +5,34 @@
  * Style variables
  */
 $base-font-family:     'Source Code Pro', monospace !default;
-$h1-size: 24.5px !default;
-$h2-size: 23.0px !default;
-$h3-size: 31.5px !default;
+$h1-size: 40.0px !default;
+$h2-size: 35.0px !default;
+$h3-size: 30.0px !default;
+$h4-size: 25.0px !default;
+$h5-size: 20.0px !default;
+$h6-size: 15.0px !default;
 $base-font-size:       1.0em !default;
 $mobile-font-size:     12px !default;
-$base-line-height:     1.5 !default;
+$base-line-height:     1.2 !default;
 $container-width:      70% !default;
 $container-max-width:  900px !default;
 
 /**
  * Global
  */
-body { background-color: var(--background-color);  margin: 0 auto;  padding: 0;  font-family: $base-font-family;  font-size: $base-font-size;  color: var(--text-color);  text-align: left;  line-height: $base-line-height !important; }
-h4, h5, h6 { font-size: $base-font-size;  margin: 0px;  margin-top: 22px;  font-weight: bold;  color: var(--text-color); }
-p, ul, ol { margin: 0px;  color: var(--text-color); }
+body { background-color: var(--background-color);  margin: 0 auto;  padding: 0;  font-family: $base-font-family;  font-size: $base-font-size;  color: var(--text-color);  text-align: left;  line-height: $base-line-height !important;}
+/*h4, h5, h6 { font-size: $base-font-size;  margin: 0px;  margin-top: 22px;  font-weight: bold;  color: var(--text-color);*/ 
+p, ul, ol { margin: 0px;  color: var(--text-color);}
 a { text-decoration: underline;  color: var(--link-color); }
 a:hover { color: var(--background-color); background-color: var(--base-color); }
 .primary-text { color: var(--primary-color); }
 @media only screen and (max-device-width: 500px) { * { font-size: $mobile-font-size !important; } }
-/*h1:before { content: "#";  margin-right: 9px; }
-h2:before { content: "##";  margin-right: 9px; }
-h3:before { content: "###";  margin-right: 9px; }
-h4:before { content: "####";  margin-right: 9px; }
-h5:before { content: "#####";  margin-right: 9px; }
-h6:before { content: "######";  margin-right: 9px; }*/
+h1 { font-size: $h1-size;}
+h2 { font-size: $h2-size;}
+h3 { font-size: $h3-size;}
+h4 { font-size: $h4-size;}
+h5 { font-size: $h5-size;}
+h6 { font-size: $h6-size;}
 
 /**
  * Layout
@@ -93,7 +96,7 @@ textarea { vertical-align: top; }
  */
 .lineno { color: var(--code-color-1); margin-right: 15px; }
 figure.highlight { margin: 5px 0; }
-pre { background-color: #212121;  border: none;  padding: 0;  margin: 0;  overflow:auto;  font-size: $base-font-size;  color: var(--text-color);  line-height: 1.7 !important;  font-family: $base-font-family !important; }
+pre { background-color: #212121;  border: none;  padding: 0;  margin: 0;  overflow:auto;  font-size: $base-font-size;  color: var(--text-color);  line-height: 1 !important;  font-family: $base-font-family !important; }
 .highlight .hll { background-color: var(--code-color-2); }
 .highlight .c { color: var(--code-color-1); font-style: italic } /* Comment */
 .highlight .err { color: var(--code-color-3); background-color: var(--code-color-4); } /* Error */
