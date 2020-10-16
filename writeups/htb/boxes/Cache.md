@@ -4,7 +4,7 @@ category: BOX - MEDIUM
 type: htb_box
 layout: page
 img-link: images/cache/cache_1.png
-desc: 10.10.10.158 - [MEDIUM] Cache by Altelus
+desc: 10.10.10.188 - [MEDIUM] Cache by Altelus
 tags: Cache writeup hackthebox
 ---
 
