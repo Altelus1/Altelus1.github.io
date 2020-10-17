@@ -1,0 +1,133 @@
+I"�!<h1 id="blunder-">Blunder <br /></h1>
+
+<p><img src="images/blunder/1.png# icon" alt="Blunder icon" /></p>
+
+<h2 id="enumeration">Enumeration</h2>
+
+<h3 id="nmap">NMAP</h3>
+<p>Let’s start with the following nmap execution
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nmap <span class="nt">-sS</span> <span class="nt">-sV</span> <span class="nt">-sC</span> <span class="nt">-p</span> 1-10000 <span class="nt">-oA</span> nmap.res <span class="nt">-v</span> blunder.htb
+</code></pre></div></div>
+<p><br />It then yielded the following result.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Nmap 7.80 scan initiated Sun Sep 13 13:55:12 2020 as: nmap -sS -sV -sC -p 1-10000 -oA nmap.res -v blunder.htb</span>
+Nmap scan report <span class="k">for </span>blunder.htb <span class="o">(</span>10.10.10.191<span class="o">)</span>
+Host is up <span class="o">(</span>0.29s latency<span class="o">)</span><span class="nb">.</span>
+Not shown: 9998 filtered ports
+PORT   STATE  SERVICE VERSION
+21/tcp closed ftp
+80/tcp open   http    Apache httpd 2.4.41 <span class="o">((</span>Ubuntu<span class="o">))</span>
+|_http-favicon: Unknown favicon MD5: A0F0E5D852F0E3783AF700B6EE9D00DA
+|_http-generator: Blunder
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-server-header: Apache/2.4.41 <span class="o">(</span>Ubuntu<span class="o">)</span>
+|_http-title: Blunder | A blunder of interesting facts
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ <span class="nb">.</span>
+<span class="c"># Nmap done at Sun Sep 13 13:57:23 2020 -- 1 IP address (1 host up) scanned in 130.83 seconds</span>
+</code></pre></div></div>
+<p><br />It turns out that the webserver is the only opened port. Let’s enumerate it.</p>
+
+<h3 id="web-pages-enumeration">Web Pages Enumeration</h3>
+
+<p>Upon visiting the website, here is the home page.<br />
+<img src="images/blunder/2.png" alt="Home Page" />
+<br />At a first look, it’s seems to be a blog website with quite a few links around it. Let’s do web files/dirs enumeration against it using <a href="https://github.com/ffuf/ffuf">ffuf</a></p>
+<h4 id="ffuf-result-using-dirbcommontxt">FFUF Result using dirb/common.txt</h4>
+<p>Let’s run ffuf fuzzer against it to discover some web files or hidden directories. Let’s look for <strong><code class="language-plaintext highlighter-rouge">.php</code></strong>,<strong><code class="language-plaintext highlighter-rouge">.txt</code></strong>, and <strong><code class="language-plaintext highlighter-rouge">.html</code></strong> files.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ffuf <span class="nt">-w</span> /usr/share/wordlists/dirb/common.txt <span class="nt">-e</span> .php,.html,.txt <span class="nt">-u</span> http://blunder.htb/FUZZ <span class="nt">-o</span> ffuf-res.txt
+</code></pre></div></div>
+<p><br />By running the following command, we can check what files or directories found by the fuzzer.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python3 <span class="nt">-m</span> json.tool ffuf-res.txt | <span class="nb">grep</span> <span class="s2">"FUZZ.*$"</span> <span class="nt">-o</span>
+FUZZ <span class="nt">-o</span> ffuf-res.txt<span class="s2">",
+FUZZ"</span>: <span class="s2">".html"</span>
+FUZZ<span class="s2">": ""
+FUZZ"</span>: <span class="s2">".hta"</span>
+FUZZ<span class="s2">": "</span>.php<span class="s2">"
+FUZZ"</span>: <span class="s2">".hta.php"</span>
+FUZZ<span class="s2">": "</span>.htaccess.txt<span class="s2">"
+FUZZ"</span>: <span class="s2">".hta.html"</span>
+FUZZ<span class="s2">": "</span>.hta.txt<span class="s2">"
+FUZZ"</span>: <span class="s2">".htaccess"</span>
+FUZZ<span class="s2">": "</span>.htaccess.html<span class="s2">"
+FUZZ"</span>: <span class="s2">".htaccess.php"</span>
+FUZZ<span class="s2">": "</span>.htpasswd<span class="s2">"
+FUZZ"</span>: <span class="s2">".htpasswd.php"</span>
+FUZZ<span class="s2">": "</span>.htpasswd.html<span class="s2">"
+FUZZ"</span>: <span class="s2">".htpasswd.txt"</span>
+FUZZ<span class="s2">": "</span>0<span class="s2">"
+FUZZ"</span>: <span class="s2">"about"</span>
+FUZZ<span class="s2">": "</span>admin<span class="s2">"
+FUZZ"</span>: <span class="s2">"cgi-bin/"</span>
+FUZZ<span class="s2">": "</span>install.php<span class="s2">"
+FUZZ"</span>: <span class="s2">"LICENSE"</span>
+FUZZ<span class="s2">": "</span>robots.txt<span class="s2">"
+FUZZ"</span>: <span class="s2">"robots.txt"</span>
+FUZZ<span class="s2">": "</span>server-status<span class="s2">"
+FUZZ"</span>: <span class="s2">"todo.txt"</span>
+FUZZ<span class="s2">",
+FUZZ"</span>,
+FUZZ <span class="nt">-o</span> ffuf-res.txt<span class="s2">",
+</span></code></pre></div></div>
+<p><br />We can see some interesting files in here but we are only interested at <strong><code class="language-plaintext highlighter-rouge">todo.txt</code></strong> and <strong><code class="language-plaintext highlighter-rouge">/admin</code></strong></p>
+<h5 id="username-in-todotxt">Username in todo.txt</h5>
+<p>Let’s check <strong><code class="language-plaintext highlighter-rouge">todo.txt</code></strong>.<br />
+<img src="images/blunder/3.png# medium" alt="todo.txt page" />
+<br />It seems that a person named <strong><code class="language-plaintext highlighter-rouge">fergus</code></strong> is part of the development team. It can be a potential username late for bruteforcing credentials if needed.</p>
+
+<h5 id="bludit-page-through-admin">Bludit Page through /admin</h5>
+<p>Another thing to look at is the <strong><code class="language-plaintext highlighter-rouge">/admin</code></strong>. Upon visiting, we are greeted with this page.<br />
+<img src="images/blunder/4.png# medium" alt="Bludit login page" />
+<br />We’ve got a possible username earlier! We just have to find the password.</p>
+<h2 id="bruteforcing-login-bludit-with-custom-wordlist">Bruteforcing Login Bludit With Custom Wordlist</h2>
+
+<h3 id="getting-all-alnum-strings-from-homepage">Getting All Alnum Strings From Homepage</h3>
+<p>We will use the alphanumerical strings we have from the homepage html and create a custom password wordlist from it. We can use the following commands to do just that.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl http://blunder.htb/ | <span class="nb">grep</span> <span class="nt">-P</span> <span class="s2">"[a-zA-Z0-9]+"</span> <span class="nt">-o</span> | <span class="nb">sort</span> <span class="nt">-u</span> | <span class="nb">uniq</span> <span class="o">&gt;</span> wordlist.txt
+</code></pre></div></div>
+<h3 id="bruteforcing-to-bludit-login">Bruteforcing to Bludit Login</h3>
+<p>Now that we have a username and a password list, let’s create a bruteforcing script for bludit login. Also, we need to be careful about the bruteforce mitigation by done by the bludit.</p>
+
+<h4 id="bypassing-the-bruteforce-mitigation">Bypassing The Bruteforce Mitigation</h4>
+<p>There is an existing script for bruteforce mitigation bypass. Can be found <a href="images/blunder/">here</a></p>
+
+<h2 id="bludit-vulnerability">Bludit Vulnerability</h2>
+<p>U</p>
+
+<h3 id="creating-a-payload-to-be-uploaded">Creating a Payload To Be uploaded</h3>
+
+<h3 id="setting-up-poc">Setting up POC</h3>
+
+<h3 id="executing-poc">Executing POC</h3>
+
+<h3 id="reverse-shell-for-better-tty-using-python3">Reverse Shell For Better TTY Using Python3</h3>
+
+<h2 id="privesc-enumeration-as-www-data">Privesc Enumeration as www-data</h2>
+
+<h2 id="note-here-the-password-recovery-thingy">Note Here the password recovery thingy</h2>
+
+<h3 id="password-hash-in-bludit-392bl-contentdatabases">Password hash in bludit-3.9.2/bl-content/databases</h3>
+
+<h3 id="password-hash-in-bludit-3100abl-contentdatabases">Password hash in bludit-3.10.0a/bl-content/databases</h3>
+
+<h2 id="cracking-found-hashes-with-john-the-ripper">Cracking Found Hashes with John The Ripper</h2>
+
+<h2 id="escalating-from-www-data-to-hugo">Escalating from www-data to hugo</h2>
+
+<h2 id="privesc-enumeration-as-hugo">Privesc Enumeration as hugo</h2>
+
+<h3 id="list-sudo-privileges">List Sudo privileges</h3>
+
+<h2 id="sudo-vulnerability">Sudo Vulnerability</h2>
+
+<h2 id="escalating-from-hugo-to-root">Escalating from hugo to root</h2>
+
+<h3 id="sudo-exploit">Sudo Exploit</h3>
+
+:ET

