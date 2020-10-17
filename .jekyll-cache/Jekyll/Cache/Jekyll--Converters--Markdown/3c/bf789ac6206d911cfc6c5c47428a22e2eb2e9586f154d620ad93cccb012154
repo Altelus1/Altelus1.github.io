@@ -1,36 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-      
-    <meta name="twitter:title" content="Blunder">
-    <meta name="twitter:description" content="10.10.10.191 - [EASY] Blunder by Altelus">
-    <meta name="twitter:card" content="summary">
-
-    <meta property="og:image" content="images/blunder/1.png">
-    <meta property="og:description" content="10.10.10.191 - [EASY] Blunder by Altelus">
-    <title>Blunder</title><!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.1.1" />
-<meta property="og:title" content="Blunder" />
-<meta property="og:locale" content="en_US" />
-<link rel="canonical" href="http://localhost:4000/writeups/htb/boxes/Blunder.html" />
-<meta property="og:url" content="http://localhost:4000/writeups/htb/boxes/Blunder.html" />
-<script type="application/ld+json">
-{"@type":"WebPage","url":"http://localhost:4000/writeups/htb/boxes/Blunder.html","headline":"Blunder","@context":"https://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
-
-
-<body>
-    <div class="container"><header>
-  <div class="menu">
-    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li></ul>
-  </div>
-</header>
-<main>
-      <h1 id="blunder-">Blunder <br /></h1>
+I"¶p<h1 id="blunder-">Blunder <br /></h1>
 
 <p><img src="images/blunder/1.png# icon" alt="Blunder icon" /></p>
 
@@ -447,11 +415,4 @@ root@blunder:/root#
   <li>https://www.exploit-db.com/exploits/48701</li>
 </ul>
 
-
-
-    </main><footer>
-  
-</footer>
-</div>
-  </body>
-</html>
+:ET
