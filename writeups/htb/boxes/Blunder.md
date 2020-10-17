@@ -118,7 +118,7 @@ Let's try it!
 python3 bruteforce.py users.txt wordlist.txt
 ```
 <br />
-**_Note: I modified the original code to accept a users list file and passwords list file and then submit the contents. If you want to check it out, you can go to insert link [here](https://github.com/Altelus1/Hacking_Adventures/blob/master/HackTheBox/Blunder/bruteforce.py)_**.
+**_Note: I modified the original code to accept a users list file and passwords list file and then submit the contents. If you want to check it out, you can go [here](https://github.com/Altelus1/Hacking_Adventures/blob/master/HackTheBox/Blunder/bruteforce.py)_**.
 <br/>After a while, we got this
 <br />
 ```bash
