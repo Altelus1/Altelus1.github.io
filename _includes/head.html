@@ -7,7 +7,8 @@
     <meta name="twitter:title" content="{{ page.title }}">
     <meta name="twitter:description" content="{{ page.meta | append: page.desc }}">
     <meta name="twitter:card" content="summary">
-
+    <meta name="twitter:image" content="{% if page.img-link %}{{page.img-link}}{% else %}/assets/images/default.png{% endif %}" />a
+    
     <meta property="og:image" content="{% if page.img-link %}{{page.img-link}}{% else %}/assets/images/default.png{% endif %}">
     <meta property="og:description" content="{{ page.meta | append: page.desc }}">
     <title>{{ page.title }}</title>
