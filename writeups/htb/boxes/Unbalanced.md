@@ -3,7 +3,7 @@ title: Unbalanced
 category: BOX - HARD
 type: htb_box
 layout: page
-img-link: images/unbalanced/1.png
+img-link: /writeups/htb/boxes/images/unbalanced/1.png
 desc: 10.10.10.200 - [HARD] Unbalanced by Altelus
 tags: Unbalanced writeup hackthebox
 ---
