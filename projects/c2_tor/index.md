@@ -65,7 +65,7 @@ Running C2 and the agent.<br />
 ![PoC](images/poc_c2tor.gif)
 
 ### End notes
-Running C2 as a hidden service would come in pros and cons. Pros would be the likes of being anonymous, be able to self-hos thus having a full control, or having a dynamic generated onion hostnames. Cons would be the likes of being easy to be detected in network and in host threat hunting or having a muuuuch slower connection to a normal C2. Enhancements or workarounds can be done to remediate the cons or weaponize the pros. At the end of the day, this is just one of the techniques can be used to serve a C2.
+Running C2 as a hidden service would come in pros and cons. Pros would be the likes of being anonymous, be able to self-host thus having a full control, or having a dynamic generated onion hostnames. Cons would be the likes of being easy to be detected in network and in host threat hunting or having a muuuuch slower connection compared to a normal C2. Enhancements or workarounds can be done to remediate the cons or weaponize the pros. At the end of the day, this is just one of the techniques can be used to serve a C2.
 <br />
 
 
