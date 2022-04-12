@@ -3,7 +3,7 @@ title: Shibboleth
 category: BOX - MEDIUM
 type: htb_box
 layout: page
-img-link: images/shibboleth/1.png
+img-link: /writeups/htb/boxes/images/shibboleth/1.png
 desc: 10.10.10.158 - [MEDIUM] Json by Altelus
 tags: Json writeup hackthebox
 ---
