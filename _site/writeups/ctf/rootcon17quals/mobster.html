@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Mobster">
+    <meta name="twitter:description" content="BinForCry 50 pts">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/rootcon17quals/images/mobster_1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/rootcon17quals/images/mobster_1.png">
+    <meta property="og:description" content="BinForCry 50 pts">
+    <title>Mobster</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Mobster" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/rootcon17quals/mobster.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/rootcon17quals/mobster.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Mobster" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Mobster","url":"http://localhost:4000/writeups/ctf/rootcon17quals/mobster.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="binforcry-mobster---50-pts">[BinForCry] Mobster - 50 Pts.</h1>
+<p><br />
+We’re given with this file.<br />
+<img src="images/mobster_1.png" alt="lol it didn't load" /><br />
+Checking out the file, it looks like a python code but something weird is being appended on the end. Also noticed that if we ever run this python script, there’s a chance that it will brick our system by executing something from <code class="language-plaintext highlighter-rouge">/usr/bin</code>.
+<br /></p>
+
+<p><img src="images/mobster_2.png" alt="lol it didn't load" />
+<br /></p>
+
+<p>From above, we can also see the first line <code class="language-plaintext highlighter-rouge">#coding: punycode</code>. Searching it, we found some other writeups on how they solve this kind of CTFs. We chose the <a href="https://medium.com/@0xMr_Robot/downunder-ctf-2023-reverse-engineering-challenges-205fc71e84ab">second one</a>.<br />
+<img src="images/mobster_3.png" alt="lol it didn't load" />
+<br />Turns out, we can run the following code against the mobster.py file.
+<br /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'&lt;&gt;'</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">).</span><span class="n">read</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s">'#coding: punycode'</span><span class="p">,</span><span class="sa">b</span><span class="s">''</span><span class="p">).</span><span class="n">decode</span><span class="p">(</span><span class="s">'punycode'</span><span class="p">))</span>
+</code></pre></div></div>
+<p><br />Running it, below is the output:
+We can derive the flag from above:<br />
+<img src="images/mobster_4.png" alt="lol it didn't load" />
+<br />Flag is: <code class="language-plaintext highlighter-rouge">RC17{welcome_2_russian_roulette}</code></p>
+
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>

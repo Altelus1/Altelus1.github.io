@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Heaven (Solution Incomplete)">
+    <meta name="twitter:description" content="Heaven 200 pts">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/rootcon17quals/images/heaven_1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/rootcon17quals/images/heaven_1.png">
+    <meta property="og:description" content="Heaven 200 pts">
+    <title>Heaven (Solution Incomplete)</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Heaven (Solution Incomplete)" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/rootcon17quals/heaven.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/rootcon17quals/heaven.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Heaven (Solution Incomplete)" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Heaven (Solution Incomplete)","url":"http://localhost:4000/writeups/ctf/rootcon17quals/heaven.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="binforcry-heaven-incomplete---200-pts">[BinForCry] Heaven (Incomplete) - 200 Pts.</h1>
+<p><br />
+We’re given with this file.<br />
+<img src="images/heaven_1.png" alt="lol it didn't load" /><br />
+Checking out the file, it seems that bruno.exe is indeed a Portable Executable (PE).
+<br /></p>
+
+<p><img src="images/heaven_2.png" alt="lol it didn't load" />
+<br />We can fire this up on a Flare-VM VM.
+<br />Since I don’t have any idea how to properly reverse engineer a PE file, I just executed the binary with FakeNet-NG on and ProcMon on. I can now intercept any connection it would do and check any changes. We’ll just note any connections and save Process Monitor output.</p>
+
+<p><br />At the execution, the binary plays a part of the <em>Locked out of Heaven</em> by Bruno Mars and a speaking person can be heard from it. But we can go back to it later. First off we can check out what is the FakeNet-NG result. 
+<br /><img src="images/heaven_3.png" alt="lol it didn't load" />
+<br />It connects to <code class="language-plaintext highlighter-rouge">178.128.23.141</code> with HTTP. Basically the full url is <code class="language-plaintext highlighter-rouge">http://178.128.23.141/10101/bruno.png</code>. The image contains the first part of the flag. <code class="language-plaintext highlighter-rouge">RC17{4r3_U</code>
+<br /><img src="images/heaven_4.png" alt="lol it didn't load" />
+<br />The execution also encrypts file under the user’s Documents and an extension of <code class="language-plaintext highlighter-rouge">part2-_l0ck3d_</code> is also being appended making the files under that folder encrypted. But hey, we got a new part of the flag :’). <code class="language-plaintext highlighter-rouge">RC17{4r3_U_l0cked_</code>
+<br /><img src="images/heaven_5.png" alt="lol it didn't load" />
+<br />Another part of the flag can be obtained from the sound playing when the binary has been executed. However, we need to know how it was played. We saved the ProcMon output and checked the events in there. We can see that a powershell execution has been created and it tries to play the <code class="language-plaintext highlighter-rouge">bruno.wav</code> file under <code class="language-plaintext highlighter-rouge">C:\Windows\Tasks\</code>.
+<br /><img src="images/heaven_6.png" alt="lol it didn't load" />
+<br />We can obtain the file out and listen to it again repeatedly from the person speaking for the final part of the flag. When we listen to it, it says <code class="language-plaintext highlighter-rouge">h34v3n_oohy34y3h}</code>. Since it says the “final” part, we have the flag <code class="language-plaintext highlighter-rouge">RC17{4r3_U_l0cked_h34v3n_oohy34y3h}</code>.
+<br />Unfortunately, this is all what we have obtained that’s why this writeup is tagged as “incomplete”. We are missing a part of the flag since when we submitted the flag it’s incorrect.</p>
+
+<p><br />For the other teams who have solved this: If you’d like to share what would be the missing solution from our team, you can ping me up as I am really interested what we missed with this. Thanks!</p>
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>

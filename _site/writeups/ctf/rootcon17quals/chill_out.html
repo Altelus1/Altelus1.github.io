@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Chilll Out">
+    <meta name="twitter:description" content="Misc 50 pts">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/rootcon17quals/images/chill_out_1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/rootcon17quals/images/chill_out_1.png">
+    <meta property="og:description" content="Misc 50 pts">
+    <title>Chilll Out</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Chilll Out" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/rootcon17quals/chill_out.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/rootcon17quals/chill_out.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Chilll Out" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Chilll Out","url":"http://localhost:4000/writeups/ctf/rootcon17quals/chill_out.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="misc-chillt-out---50-pts">[Misc] Chillt Out - 50 Pts.</h1>
+
+<p><br />
+We’re given with this wav file.<br />
+<img src="images/chill_out_1.png" alt="lol it didn't load" />
+<br />A teammate of mine, EnGyn, managed to pull out an ELF file out of the WAV file using <a href="http://jpinsoft.net/deepsound/documentation.aspx">deepsound</a><br />
+<img src="images/chill_out_2.png" alt="lol it didn't load" />
+<br />We ran <code class="language-plaintext highlighter-rouge">strings</code> command on the <code class="language-plaintext highlighter-rouge">hello</code> binary file and and found a <code class="language-plaintext highlighter-rouge">PyInstaller</code> keyword in there.<br />
+<img src="images/chill_out_3.png" alt="lol it didn't load" />
+<br />Suspecting that it may have been compiled using PyInstaller, we extracted that contents using <a href="https://github.com/extremecoders-re/pyinstxtractor">pyinstxtractor.py</a>. However, there is a problem when we tried it in my Kali Linux. A warning has appeared.<br />
+<img src="images/chill_out_5.png" alt="lol it didn't load" />
+<br />Since the python3 version I have is 3.11.2, there’s likely going to have a problem later when we try to reverse engineer the files further. I don’t want to brick my python3 also by installing another version. So we switched to my Remnux Box which has a compatible python3 version. In there, we ran the pyinstxtractor.py
+<br /><img src="images/chill_out_4.png" alt="lol it didn't load" /><br />
+<code class="language-plaintext highlighter-rouge">hello_extracted</code> folder has been created.<br />
+<img src="images/chill_out_6.png" alt="lol it didn't load" /><br />
+As instructed also, we tried reverting .pyc file to .py and hopefully retrieve the original python script. We used <a href="https://pypi.org/project/uncompyle6/">uncompyle6</a>
+<br /><img src="images/chill_out_7.png" alt="lol it didn't load" /><br />
+Turns out as well that it’s protected by <a href="https://github.com/dashingsoft/pyarmor">PyArmor</a>. Any debofuscation scripts we have used didn’t work. The plan now is to dump the memory of the script when the pyarmor has already deobfuscated the script for us. We used this <a href="https://gist.githubusercontent.com/Dbof/b9244cfc607cf2d33438826bee6f5056/raw/aa4b75ddb55a58e2007bf12e17daadb0ebebecba/memdump.py">memory dumper</a>.
+<br />We will attempt the steps below:</p>
+
+<p>1) Run a waiting one-liner command where if it sees the .pyc is running, it will retrieve its PID and use it to dump the memory immediately.
+2) Run the .pyc file. 
+3) Analyze the dumped memory
+<br />However, the above steps can only work if we can manage to run the script in the first place. Fortunately, we can. We just have to put <code class="language-plaintext highlighter-rouge">hello.pyc</code>, <code class="language-plaintext highlighter-rouge">\_pytransform.so</code>, and <code class="language-plaintext highlighter-rouge">pytransform.pyc</code> in the same directory.
+<br /><img src="images/chill_out_8.png" alt="lol it didn't load" />
+<br />We also noticed that the script requires an argument.<br />
+The following bash one-liner is used to wait and dump the memory of the target pyc script:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">while </span><span class="nb">true</span><span class="p">;</span><span class="k">do </span><span class="nv">x</span><span class="o">=</span><span class="si">$(</span> ps <span class="nt">-aux</span> | <span class="nb">grep </span>hello.pyc | <span class="nb">grep grep</span> <span class="nt">-v</span> | <span class="nb">awk</span> <span class="s1">'{ print $2 }'</span><span class="si">)</span><span class="p">;</span> <span class="k">if</span> <span class="o">[</span> <span class="k">${#</span><span class="nv">x</span><span class="k">}</span> <span class="nt">-ge</span> 1 <span class="o">]</span><span class="p">;</span> <span class="k">then</span> <span class="o">(</span> <span class="nb">sleep </span>0.05<span class="p">;</span> python3 memdump.py <span class="nv">$x</span><span class="o">)</span><span class="p">;</span> <span class="k">fi</span><span class="p">;</span><span class="k">done</span>
+
+</code></pre></div></div>
+<p><br />Also notice that we put <code class="language-plaintext highlighter-rouge">sleep 0.05</code> in there. The waiting command is too fast and dumps the memory immediately while the pyarmor is yet to deobfuscate the script. The <code class="language-plaintext highlighter-rouge">sleep</code> serves as a waiting mechanism to give time pyarmor to deobfuscate the script.
+<br />We executed the one-liner and once it sees the running pyc file, it will attempt to dump it.
+<br /><img src="images/chill_out_9.png" alt="lol it didn't load" />
+<br />The dump is then output to 161043.dump</p>
+
+<p><br /><img src="images/chill_out_10.png" alt="lol it didn't load" /></p>
+
+<p><br />Next is to analyze the dump. First, we just output the strings. We found a string that pertains to the CTF organizers with heart symbol on it.</p>
+
+<p><br /><img src="images/chill_out_11.png" alt="lol it didn't load" /></p>
+
+<p><br />We tried this as the argument:</p>
+
+<p><br /><img src="images/chill_out_12.png" alt="lol it didn't load" /></p>
+
+<p><br />We got the flag: <code class="language-plaintext highlighter-rouge">rc{jus7_r3m3mb3r_th4t_it_aint_0v3r_t1ll_its_over}</code></p>
+
+<p><br />Author’s note: This technique is a hit or miss. Many tries have been done before a remarkable result has been obtained since this is a race-condition based approach.</p>
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>
