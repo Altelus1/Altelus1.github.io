@@ -57,6 +57,8 @@ img[src~="small"] { max-width: 300px; max-height: 100px; }
 
 img[src~="small-p"] { max-width: 100px; max-height: 300px; }
 
+img[src~="small-pp"] { max-width: 130px; max-height: 500px; }
+
 img[src~="medium-p"] { max-width: 300px; max-height: 500px; }
 
 img[src~="big-p"] { max-width: 500px; max-height: 700px; }

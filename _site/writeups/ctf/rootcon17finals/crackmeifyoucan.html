@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Crack Me If You Can">
+    <meta name="twitter:description" content="Misc 100 pts">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/rootcon17finals/images/crackmeifyoucan_1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/rootcon17finals/images/crackmeifyoucan_1.png">
+    <meta property="og:description" content="Misc 100 pts">
+    <title>Crack Me If You Can</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Crack Me If You Can" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/rootcon17finals/crackmeifyoucan.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/rootcon17finals/crackmeifyoucan.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Crack Me If You Can" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Crack Me If You Can","url":"http://localhost:4000/writeups/ctf/rootcon17finals/crackmeifyoucan.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="misc-crack-me-if-you-can---100-pts">[Misc] Crack Me If You Can - 100 Pts.</h1>
+<p><br />
+We’re given with this file.<br />
+<img src="images/crackmeifyoucan_1.png" alt="lol it didn't load" />
+<br />Attempting to unzip the file…
+<br /><img src="images/crackmeifyoucan_2.png" alt="lol it didn't load" />
+<br />And as expected, the zip file is password protected.
+<br />Examining the file further using <code class="language-plaintext highlighter-rouge">exiftool</code>, we noticed that there are the <code class="language-plaintext highlighter-rouge">flag.txt</code> and <code class="language-plaintext highlighter-rouge">pwndemanile_n</code> files contained.
+<br /><img src="images/crackmeifyoucan_3.png" alt="lol it didn't load" />
+<br />It can also be noticed that the contents of <code class="language-plaintext highlighter-rouge">pwndemanila_n</code> files are small. We researched how can we take a leverage of small sized files inside an encrypted zip file and we found a <a href="https://github.com/kmyk/zip-crc-cracker">script</a> that can extract plaintext contents of an encrypted file if the original file is around 4 bytes in size. It leverages the CRC value (checksum of the plaintext contents) and the fact that the plaintext content is very short.
+<br />Before running the script, we edited the script to only just include files that have small size (in this case, we only wanted files that &lt;= 4)
+<br /><img src="images/crackmeifyoucan_4.png" alt="lol it didn't load" />
+<br />Running the script…
+<br /><img src="images/crackmeifyoucan_5.png" alt="lol it didn't load" />
+<br />…it successfully retrieved the plaintext contents of <code class="language-plaintext highlighter-rouge">pwndemanila_n</code> files. Putting the plaintext values together, it is <code class="language-plaintext highlighter-rouge">w0w_CRC_is_cool!</code>. 
+<br />We attempted to use the contents as the password for the zip file but it didn’t work. We then attempted to use <code class="language-plaintext highlighter-rouge">john</code> the ripper and use the plaintext value as password and used the <code class="language-plaintext highlighter-rouge">best64</code> rule. Executing it…
+<br /><img src="images/crackmeifyoucan_6.png" alt="lol it didn't load" />
+<br /><img src="images/crackmeifyoucan_7.png" alt="lol it didn't load" />
+<br />We managed to get the password! We can now decrypt the zip file.
+<br /><img src="images/crackmeifyoucan_8.png" alt="lol it didn't load" />
+<br />Another hurdle of getting the actual flag is below. It says:
+<br /></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Self-referential Flag: 74727797585725868563670619968733418648978952871542838634446291769766902235583452877417029739108362173216050903525913352193485450891823214174930118201302794913291247532610293490648341670311579281104984986791076098446951803492192050291107304975089063315997975197652577946386628978027257744209303977452405415448643128774038924584335955117526789049902060961118076299197461165536952950229513458715747163675022004172321173833147759970504483847813030034856709812865344775137889660556689623059924738995522395659426236286603983452668036975351801315328
+
+What? Numbers? Is this a mathematical problem? Well, it's not. Although you can use them to create a visual representation of the flag =)
+
+
+</code></pre></div></div>
+<p><br />After a lot of brainfarting and headbanging, we tried to convert the number into binary number in the hopes that the digits may somehow form some kind of image. (e.g. QR Code, actual text, etc.)
+<br /><img src="images/crackmeifyoucan_9.png" alt="lol it didn't load" />
+<br />After some time of checking out any combination, we managed to get a “readable”, sort of, text that looks like a flag format. We have to squish the binaries vertically by adjusting the terminal window and piping the binary into a <code class="language-plaintext highlighter-rouge">grep</code> command so that there is a color appearing for 1s or 0s.
+<br />We used
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat </span>bins.txt| <span class="nb">grep </span>0
+</code></pre></div></div>
+<p><br /><img src="images/crackmeifyoucan_10.png# small-pp" alt="lol it didn't load" />
+<br /><img src="images/crackmeifyoucan_11.png" alt="lol it didn't load" />
+<br />Above is the rotated image so you don’t have to tilt your head like an idiot like we did :).
+<br />The real gave away here are the curly braces and the <code class="language-plaintext highlighter-rouge">0</code> character in the center. However, this is still a head scratcher since we do not know what to interpret here and anything is barely readable.
+<br />With more headbanging and noticing, it seems that the upper half is more readable than the lower half so we created a script that removes the lower half and print only the upper half. See the code below.
+<br /></p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">wrap</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="n">filename</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">rf</span><span class="p">:</span>
+    <span class="n">contents</span> <span class="o">=</span> <span class="n">rf</span><span class="p">.</span><span class="n">read</span><span class="p">()</span>
+
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">wrap</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">i</span><span class="p">)],</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">).</span><span class="n">replace</span><span class="p">(</span><span class="s">"1"</span><span class="p">,</span><span class="sa">u</span><span class="s">"</span><span class="se">\u2588</span><span class="s">"</span><span class="p">).</span><span class="n">replace</span><span class="p">(</span><span class="s">"0"</span><span class="p">,</span><span class="s">" "</span><span class="p">))</span>
+
+
+</code></pre></div></div>
+<p><br />Below result can be obtained. We also replaced 1s with a block (\u2588) and 0s with a space character for much better visuals.
+<br /><img src="images/crackmeifyoucan_13.png" alt="lol it didn't load" />
+<br />From this, we can better derive the flag.
+<br />We know that the first 5 characters are <code class="language-plaintext highlighter-rouge">RC17{</code>
+<br />The 6th character, we may conclude that it may be <code class="language-plaintext highlighter-rouge">B</code>, <code class="language-plaintext highlighter-rouge">R</code>, or <code class="language-plaintext highlighter-rouge">P</code>. It’s not <code class="language-plaintext highlighter-rouge">R</code> because it’s not the same with <code class="language-plaintext highlighter-rouge">R</code> from the first character. Therefore, our option is only <code class="language-plaintext highlighter-rouge">B</code> or <code class="language-plaintext highlighter-rouge">P</code>
+<br />7th character is <code class="language-plaintext highlighter-rouge">H</code>
+<br />8th character is <code class="language-plaintext highlighter-rouge">I</code>. We know this because it doesn’t have a <code class="language-plaintext highlighter-rouge">1</code> and the only other alphabet letter that can contain that form is <code class="language-plaintext highlighter-rouge">I</code>
+<br />9th character is <code class="language-plaintext highlighter-rouge">L</code>. No other form in the alphabet upper can do it.
+<br />10th character is either <code class="language-plaintext highlighter-rouge">0</code> or <code class="language-plaintext highlighter-rouge">O</code>
+<br />11th is <code class="language-plaintext highlighter-rouge">M</code>. 
+<br />12th is <code class="language-plaintext highlighter-rouge">A</code>.
+<br />13th is <code class="language-plaintext highlighter-rouge">T</code>.
+<br />14th is <code class="language-plaintext highlighter-rouge">H</code>.
+<br />15th, obviously <code class="language-plaintext highlighter-rouge">}</code>
+<br />So we have <code class="language-plaintext highlighter-rouge">RC17{?HIL?MATH}</code>. Researching “bhilomath” or “philomath”, the only one that makes sense is the “philomath”. Therefore, <code class="language-plaintext highlighter-rouge">RC17{PHIL0MATH}</code> or <code class="language-plaintext highlighter-rouge">RC17{PHILOMATH}</code> may be the answer.
+<br />Submitting the flag, <code class="language-plaintext highlighter-rouge">RC17{PHILOMATH}</code> was the correct answer.</p>
+
+<h2 id="much-easy-and-intended-solution">Much easy and intended solution</h2>
+<p>I discussed with motoh4ck3r, the challenge creator, about our solution. The intended solution for the last part is different from our method. Turns out, we can search “Tupper self referential formula playground”. The “Self-referential Flag” should have been the clue.</p>
+
+<p><a href="https://keelyhill.github.io/tuppers-formula/">https://keelyhill.github.io/tuppers-formula/</a> is used and the number provided can be used in there to get the flag properly.</p>
+
+<p><br /><img src="images/crackmeifyoucan_14.png" alt="lol it didn't load" /></p>
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>
