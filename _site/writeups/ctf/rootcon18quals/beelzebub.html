@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Beelzebub">
+    <meta name="twitter:description" content="Heaven 100 pts">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/rootcon18quals/images/bin4cry/beelzebub/img1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/rootcon18quals/images/bin4cry/beelzebub/img1.png">
+    <meta property="og:description" content="Heaven 100 pts">
+    <title>Beelzebub</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Beelzebub" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/rootcon18quals/beelzebub.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/rootcon18quals/beelzebub.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Beelzebub" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Beelzebub","url":"http://localhost:4000/writeups/ctf/rootcon18quals/beelzebub.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="binforcry-beelzebub---100-pts">[BinForCry] Beelzebub - 100 Pts.</h1>
+<p><br />
+We’re given with this file.<br />
+<img src="images/bin4cry/beelzebub/img1.PNG" alt="lol it didn't load" /><br />
+Output states that it’s an ELF file.
+<br /></p>
+
+<p>We loaded it on Ghidra and checked out main function.<br />
+<img src="images/bin4cry/beelzebub/img2.PNG" alt="lol it didn't load" /><br />
+There are a lot of checks going on within the main function however what we want is inside <code class="language-plaintext highlighter-rouge">FUN_001014c0</code>:<br />
+<img src="images/bin4cry/beelzebub/img3.PNG" alt="lol it didn't load" /><br />
+As can be seen, it prints <code class="language-plaintext highlighter-rouge">RC18{</code> thus we can say that this function prints the flag. Let’s investigate the required parameters.<br />
+<img src="images/bin4cry/beelzebub/img4.5.PNG" alt="lol it didn't load" /><br />
+We can try <code class="language-plaintext highlighter-rouge">beelzebub</code> as the 3rd parameter by setting RDX register to an address where string <code class="language-plaintext highlighter-rouge">beelzebub</code> is stored when that function is called in gdb.<br />
+We need to find the setting of 0x1b39, 0x1a4, and “ILOVEROOTCON” series of instruction. It can be found starting on <code class="language-plaintext highlighter-rouge">0x55555555527c</code>.<br />
+<img src="images/bin4cry/beelzebub/img6.PNG" alt="lol it didn't load" /><br />
+By setting the RIP register to 0x555555555279 (I set the RIP register after breaking on the <code class="language-plaintext highlighter-rouge">main</code> function), it will then setup the parameters required for the print flag function. We then set a break point to the 0x55555555528d, calling <code class="language-plaintext highlighter-rouge">0x5555555554c0</code> which is the “print flag” function.<br />
+<img src="images/bin4cry/beelzebub/img9.PNG" alt="lol it didn't load" /><br />
+As can be seen, RDX registry makes no sense so we can set it to an address where string “beelzebub” is stores. We know these exists because they are present in the decompiled code. Within the main function, we found it on <code class="language-plaintext highlighter-rouge">0x555555556080</code>. We set the RDX to that address and continued execution. Upon execution, it printed the flag.<br />
+<img src="images/bin4cry/beelzebub/img12.PNG" alt="lol it didn't load" /><br /></p>
+
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>

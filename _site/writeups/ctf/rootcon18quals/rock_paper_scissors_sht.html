@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Rock Paper Scissors Sh**t">
+    <meta name="twitter:description" content="Rock Paper Scissors Sh**t">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/rootcon18quals/images/misc/rock_paper_scissors_sht/img1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/rootcon18quals/images/misc/rock_paper_scissors_sht/img1.png">
+    <meta property="og:description" content="Rock Paper Scissors Sh**t">
+    <title>Rock Paper Scissors Sh**t</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Rock Paper Scissors Sh**t" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/rootcon18quals/rock_paper_scissors_sht.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/rootcon18quals/rock_paper_scissors_sht.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Rock Paper Scissors Sh**t" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Rock Paper Scissors Sh**t","url":"http://localhost:4000/writeups/ctf/rootcon18quals/rock_paper_scissors_sht.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="misc-rock-paper-scissors-sht">[Misc] Rock Paper Scissors Sh**t</h1>
+<p>We’re given an IP and a port to connect to - <code class="language-plaintext highlighter-rouge">45.77.20.199:6969</code><br />
+<img src="images/misc/rock_paper_scissors_sht/img3.png" alt="lol it didn't load" /><br />
+We tried connecting to it and it’s a rock paper scissor game. We tried poking around with it and we discovered that each iteration, the winning sequence is the same. We built a python code to interface with the input and output. The idea is as follows:
+<br /></p>
+<ol>
+  <li>Send the known correct winning sequence. It will stop on an iteration number where no known winning move is reached.</li>
+  <li>Set the current iteration number.</li>
+  <li>Send input: rock, paper, and scissors. If the input is losing, return to step 1 to try the next input until a winning move is accepted.</li>
+  <li>Save the current iteration number along the winning input adding it to the known winning sequence.</li>
+  <li>Repeat until step 1000</li>
+</ol>
+
+<p><br />The following code is used to do this automatically:
+<br /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="n">winning_sequence</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">0</span> <span class="p">:</span> <span class="sa">b</span><span class="s">"paper"</span><span class="p">,</span>
+    <span class="mi">1</span> <span class="p">:</span> <span class="sa">b</span><span class="s">"scissors"</span><span class="p">,</span>
+    <span class="mi">2</span> <span class="p">:</span> <span class="sa">b</span><span class="s">"rock"</span><span class="p">,</span>
+    <span class="mi">3</span> <span class="p">:</span> <span class="sa">b</span><span class="s">"paper"</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">guess_winning_move</span><span class="p">(</span><span class="n">curr_round</span><span class="p">):</span>
+
+    <span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s">"rock"</span><span class="p">,</span> <span class="sa">b</span><span class="s">"paper"</span><span class="p">,</span> <span class="sa">b</span><span class="s">"scissors"</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">:</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">'45.77.20.199'</span><span class="p">,</span> <span class="mi">6969</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">winning_sequence</span><span class="p">.</span><span class="n">items</span><span class="p">()])</span>
+
+        <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"move: "</span><span class="p">))</span>
+        
+        <span class="k">print</span><span class="p">(</span><span class="s">"Sending {}..."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+        <span class="n">r</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"move: "</span><span class="p">)</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="sa">b</span><span class="s">"You won!"</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+
+            <span class="k">print</span><span class="p">(</span><span class="s">"{} is winning on round {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">curr_round</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">r</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">curr_round</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+        <span class="n">r</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">save_winning_sequence</span><span class="p">():</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"winning_sequence.txt"</span><span class="p">,</span> <span class="s">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">wf</span><span class="p">:</span>
+        <span class="n">wf</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">winning_sequence</span><span class="p">))</span>
+
+<span class="n">wins</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">1001</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Guess winning move of rnd {}..."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">curr_round</span><span class="p">,</span> <span class="n">winning_move</span> <span class="o">=</span> <span class="n">guess_winning_move</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">winning_sequence</span><span class="p">[</span><span class="n">curr_round</span><span class="p">]</span> <span class="o">=</span> <span class="n">winning_move</span>
+    <span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">winning_sequence</span><span class="p">))</span>
+    <span class="n">save_winning_sequence</span><span class="p">()</span>
+</code></pre></div></div>
+<p><br />We found the sequence and therefore the flag:<br />
+<img src="images/misc/rock_paper_scissors_sht/img1.png" alt="lol it didn't load" /><br /></p>
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>

