@@ -105,6 +105,8 @@ curl <span class="nv">$new_url</span>
 </code></pre></div></div>
 <p><br />An example of usage of the script:<br />
 <img src="images/web/hashland/img14.png" alt="lol it didn't load" /><br />
+We tried accessing the <code class="language-plaintext highlighter-rouge">/flag.php</code> but there’s no flag in there:<br />
+<img src="images/web/hashland/img18.png" alt="lol it didn't load" /><br />
 We then targeted the <code class="language-plaintext highlighter-rouge">phpinfo.php</code>. This is also a forbidden page.<br />
 <img src="images/web/hashland/img15.png" alt="lol it didn't load" /><br />
 The PHP info page…<br />
@@ -115,7 +117,7 @@ We can now forge new payloads for the page without the hash_extender. Example of
 <img src="images/web/hashland/img20.png" alt="lol it didn't load" /><br />
 <img src="images/web/hashland/img21.png" alt="lol it didn't load" /><br />
 And this our progress ends sadly. What we did next is that we tried to forge new payloads where we used PHP Filters, data, and some other payloads so that we can execute code or read arbitary files but no payloads have been working.<br />
-The challenge author (Motoh4ck3r) mentioned that the flag should be near through one of the server variables but the PHP Info output that we got doesn’t have it. There are other payloads we can use but since the “.php” extension appending done by the backend, it may restrict our payloads. We have to do some more bypasses where we simply don’t have time during the competition.</p>
+The challenge author (Motoh4ck3r) mentioned that the flag real directory should be through one of the server variables but the PHP Info output that we got doesn’t have it. There are other payloads we can use but since the “.php” extension appending done by the backend, it may restrict our payloads. We have to do some more bypasses where we simply don’t have time during the competition.</p>
 
 
 

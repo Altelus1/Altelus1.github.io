@@ -80,6 +80,8 @@ curl $new_url
 ```
 <br />An example of usage of the script:<br />
 ![lol it didn't load](images/web/hashland/img14.png)<br />
+We tried accessing the `/flag.php` but there's no flag in there:<br />
+![lol it didn't load](images/web/hashland/img18.png)<br />
 We then targeted the `phpinfo.php`. This is also a forbidden page.<br />
 ![lol it didn't load](images/web/hashland/img15.png)<br />
 The PHP info page...<br />
@@ -90,6 +92,6 @@ We can now forge new payloads for the page without the hash_extender. Example of
 ![lol it didn't load](images/web/hashland/img20.png)<br />
 ![lol it didn't load](images/web/hashland/img21.png)<br />
 And this our progress ends sadly. What we did next is that we tried to forge new payloads where we used PHP Filters, data, and some other payloads so that we can execute code or read arbitary files but no payloads have been working.<br />
-The challenge author (Motoh4ck3r) mentioned that the flag should be near through one of the server variables but the PHP Info output that we got doesn't have it. There are other payloads we can use but since the ".php" extension appending done by the backend, it may restrict our payloads. We have to do some more bypasses where we simply don't have time during the competition.
+The challenge author (Motoh4ck3r) mentioned that the flag real directory should be through one of the server variables but the PHP Info output that we got doesn't have it. There are other payloads we can use but since the ".php" extension appending done by the backend, it may restrict our payloads. We have to do some more bypasses where we simply don't have time during the competition.
 
 
