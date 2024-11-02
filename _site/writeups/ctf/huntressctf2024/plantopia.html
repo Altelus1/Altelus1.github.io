@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Plantopia">
+    <meta name="twitter:description" content="Plantopia">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/huntressctf2024/img/plantopia/1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/huntressctf2024/img/plantopia/1.png">
+    <meta property="og:description" content="Plantopia">
+    <title>Plantopia</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Plantopia" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/huntressctf2024/plantopia.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/huntressctf2024/plantopia.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Plantopia" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Plantopia","url":"http://localhost:4000/writeups/ctf/huntressctf2024/plantopia.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="web-plantopia">[Web] Plantopia</h1>
+<p>The following landing page can be seen:<br />
+<img src="img/plantopia/1.png" alt="lol it didn't load" /><br />
+With the credentials given through the challenge description, we get to see the list of plants.<br />
+<img src="img/plantopia/2.png" alt="lol it didn't load" /><br />
+We are also curious about the login session data used.<br />
+<img src="img/plantopia/3.png" alt="lol it didn't load" /><br />
+It’s a base64 and the decoded string is: <br />
+<img src="img/plantopia/4.png" alt="lol it didn't load" /><br />
+It seems a very simple structure of a session data. What if we set the 0 value to 1?<br />
+<img src="img/plantopia/5.png" alt="lol it didn't load" /><br />
+<img src="img/plantopia/6.png" alt="lol it didn't load" /><br />
+We suddenly got an “Admin” button on the dashboard! Checking it out, we can see that it lets us select a plant. Aside from the Admin page, we also have “API Docs” button and it sends us to the Swagger UI.<br />
+<img src="img/plantopia/7.png" alt="lol it didn't load" /><br />
+As can be seen above, there are numerous API endpoints. However, there’s only two that’s very important for us: (1) /api/admin/settings<br />
+<img src="img/plantopia/8.png" alt="lol it didn't load" /><br />
+It looks like the alert_command is an actual bash command. Another important API endpoint is (2) /api/admin/sendmail.<br />
+<img src="img/plantopia/9.png" alt="lol it didn't load" /><br />
+Befor we can use these APIs, we should set an API key first. The modified base64 blob that we had earlier can be used.<br />
+<img src="img/plantopia/10.png" alt="lol it didn't load" /><br />
+In the /api/admin/settings, we replaced the <code class="language-plaintext highlighter-rouge">sendmail</code> command with a reverse shell.<br />
+<img src="img/plantopia/11.png" alt="lol it didn't load" /><br />
+However, we received an error that there should be a “/usr/sbin/sendmail” on the payload.<br />
+<img src="img/plantopia/12.png" alt="lol it didn't load" /><br />
+So we updated it to the following:<br />
+<img src="img/plantopia/13.png" alt="lol it didn't load" /><br />
+It got accepted!<br />
+<img src="img/plantopia/14.png" alt="lol it didn't load" /><br />
+We can then send request to /api/admin/sendmail to trigger the execution. And we got a root shell!<br />
+<img src="img/plantopia/16.png" alt="lol it didn't load" /><br />
+We can find the flag on /srv/app.<br />
+<img src="img/plantopia/17.png" alt="lol it didn't load" /><br /></p>
+
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>

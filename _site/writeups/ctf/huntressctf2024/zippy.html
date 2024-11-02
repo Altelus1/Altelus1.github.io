@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Zippy">
+    <meta name="twitter:description" content="Zippy">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/huntressctf2024/img/1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/huntressctf2024/img/1.png">
+    <meta property="og:description" content="Zippy">
+    <title>Zippy</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Zippy" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/huntressctf2024/zippy.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/huntressctf2024/zippy.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Zippy" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Zippy","url":"http://localhost:4000/writeups/ctf/huntressctf2024/zippy.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="web-zippy">[Web] Zippy</h1>
+<p>The following challenge description has been given:<br />
+<img src="img/zippy/1.png" alt="lol it didn't load" /><br />
+This is the landing page:<br />
+<img src="img/zippy/2.png" alt="lol it didn't load" /><br />
+It seems that we can upload files on the server. The other webpages available to us are:<br />
+<code class="language-plaintext highlighter-rouge">/Upload</code> page. It looks like this is the page where we can upload files. It seems to accept ZIP files.<br />
+<img src="img/zippy/3.png" alt="lol it didn't load" /><br />
+<code class="language-plaintext highlighter-rouge">/Browse</code> page. We can browse the available files and folders on the specified directory in the input.<br />
+<img src="img/zippy/4.png" alt="lol it didn't load" /><br />
+We tried sending <code class="language-plaintext highlighter-rouge">/</code> and it works. We can find files and folders within the root directory<br />
+<img src="img/zippy/4.5.png" alt="lol it didn't load" /><br />
+<code class="language-plaintext highlighter-rouge">/app</code> seems to be not a default folder in the root so we checked it out. We can find that this is the folder for the web application. We can also see that that’s where the flag.txt is stored.<br />
+<img src="img/zippy/5.png" alt="lol it didn't load" /><br />
+<code class="language-plaintext highlighter-rouge">/Logs</code> page. It seems like this just reflects a log file somewhere within the filesystem. Apparently, it can be found on <code class="language-plaintext highlighter-rouge">/app/logs/application.log</code>.<br />
+<img src="img/zippy/6.png" alt="lol it didn't load" /><br />
+Since it allows us to upload zip files and would extract the contents of the zip files, we can try using ZipSlip attack to arbitrary write files wherever (with permission context in mind) on the filesystem. We have used this <a href="https://raw.githubusercontent.com/cesarsotovalero/zip-slip-exploit-example/refs/heads/master/evilarc.py">python script</a> to create zip files with directory traversal payload on the filename. We tried creating a example file called <code class="language-plaintext highlighter-rouge">hello.txt</code> and tried setting it on <code class="language-plaintext highlighter-rouge">/app/</code><br />
+<img src="img/zippy/7.png" alt="lol it didn't load" /><br />
+We uploaded it successfully:<br />
+<img src="img/zippy/8.png" alt="lol it didn't load" /><br />
+<img src="img/zippy/9.png" alt="lol it didn't load" /><br />
+And it successfully placed the file on the target directory.<br />
+<img src="img/zippy/10.png" alt="lol it didn't load" /><br />
+From here, we tried uploading symbolic links to point it to the flag.txt but it didn’t work. Symbolic links were not executing when placed on the web server. Proceeding with another tactic, we saw the <code class="language-plaintext highlighter-rouge">/app/Pages</code> and its contents. Ther are various <code class="language-plaintext highlighter-rouge">.cshtml</code> stored.<br />
+<img src="img/zippy/11.png" alt="lol it didn't load" /><br />
+We tried searching for .cshtml webshell and there are a lot. We specifically used this <a href="https://raw.githubusercontent.com/hex0punk/MSShell/refs/heads/master/Shell.cshtml">webshell</a>. The plan now is to overwrite <code class="language-plaintext highlighter-rouge">Logs.cshtml</code> then acess the <code class="language-plaintext highlighter-rouge">/Logs</code> hoping that we will be greeted by a webshell instead.<br />
+We created Logs.cshtml and used it with the ZipSlip exploit python script and then uploaded it.<br />
+<img src="img/zippy/12.png" alt="lol it didn't load" /><br />
+<img src="img/zippy/13.png" alt="lol it didn't load" /><br />
+After accessing <code class="language-plaintext highlighter-rouge">/Logs</code>, we met with an error:<br />
+<img src="img/zippy/14.png" alt="lol it didn't load" /><br />
+It seems like we need to setup the <code class="language-plaintext highlighter-rouge">Logs.cshtml</code> properly however I don’t have any idea how to fix this kind of error. But we can note the following error: “A page must inherit from ‘Microsoft.AspNetCore.Mvc.RazorPages.Pagebase’”. It seems that Razor is being used to load the .cshtml files (It’s also specified in <code class="language-plaintext highlighter-rouge">/About</code>). We can check out some example .cshtml files from github repositories just to see if we can create a similar setup for our webshell to work. We found an example <a href="https://github.com/manuelsidler/razor-pages-sample/blob/master/src/RazorPagesSample.Web/Pages/Books.cshtml">here</a>. Checking out the contents, we noticed the first two lines of the example “Books.cshtml”<br />
+<img src="img/zippy/15.png" alt="lol it didn't load" /><br />
+We can try prepending these first two lines to our webshell and reupload it again. Noticed that instead of putting “BooksModel”, we put “LogsModel” instead since we know this page deals with Logs. We’re just hoping at this point that it would work.<br />
+<img src="img/zippy/16.png" alt="lol it didn't load" /><br />
+We got a new error!<br />
+<img src="img/zippy/17.png" alt="lol it didn't load" /><br />
+It seems that the error specified that we have the wrong way of getting “cmd” parameter value but we can always just hardcode the command within the Logs.cshtml and reupload it. This time, we just want to print the flag so we can use <code class="language-plaintext highlighter-rouge">cat /app/flag.txt</code> instead.<br />
+<img src="img/zippy/18.png" alt="lol it didn't load" /><br />
+After reuploading and accessing <code class="language-plaintext highlighter-rouge">/Logs</code> again, we successfully executed and we got the flag.<br />
+<img src="img/zippy/19.png" alt="lol it didn't load" /><br /></p>
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>

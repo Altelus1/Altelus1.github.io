@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="Helpfuldesk">
+    <meta name="twitter:description" content="Helpfuldesk">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/huntressctf2024/img/helpfuldesk/1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/huntressctf2024/img/helpfuldesk/1.png">
+    <meta property="og:description" content="Helpfuldesk">
+    <title>Helpfuldesk</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Helpfuldesk" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/huntressctf2024/helpfuldesk.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/huntressctf2024/helpfuldesk.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Helpfuldesk" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Helpfuldesk","url":"http://localhost:4000/writeups/ctf/huntressctf2024/helpfuldesk.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="web-helpfuldesk">[Web] Helpfuldesk</h1>
+<p>The following challenge description has been given:<br />
+<img src="img/helpfuldesk/1.png" alt="lol it didn't load" /><br />
+Below is the landing web page:<br />
+<img src="img/helpfuldesk/2.png" alt="lol it didn't load" /><br />
+We are not given with credentials nor any common credentials worked. However, we can see that a security bulletin has been mentioned.<br />
+<img src="img/helpfuldesk/3.png" alt="lol it didn't load" /><br />
+Looking at that page, we are brought to a page where we can download the web application files.<br />
+<img src="img/helpfuldesk/4.png" alt="lol it didn't load" /><br />
+We can see that there is a v1.2 update and it’s needed to patch a critical vulnerability to the helpfuldesk app. Downloading it and extracting it, the following files can be obtained.<br />
+<img src="img/helpfuldesk/5.png" alt="lol it didn't load" /><br />
+It seems that they are compiled through .NET Framework. We can use dnSpy or ilSpy to decompile the relative .exe or .dll file. It was Helpfuldesk.dll that has the information we need. The Decompiled code is shown below:<br />
+<img src="img/helpfuldesk/6.png" alt="lol it didn't load" /><br />
+We can make out the available endpoints by checking out the Controllers. For example: AccountController has Logout. To access it, we have to visit <code class="language-plaintext highlighter-rouge">/Account/Logout</code> on the website. We checked each available endpoints and the one that interests us is SetupController -&gt; SetupWizard. Decompiled code can be seen below:<br />
+<img src="img/helpfuldesk/7.PNG" alt="lol it didn't load" /><br />
+As can be seen, registering a new account doesn’t have a restriction. Unauthenticated users can create their own account. So we tried creating one:<br />
+<img src="img/helpfuldesk/8.png" alt="lol it didn't load" /><br />
+Redirecting to /Setup/SetupComplete means successful registration. We created an account with creds <code class="language-plaintext highlighter-rouge">admin:admin</code>. We managed to login with the created account.<br />
+<img src="img/helpfuldesk/9.png" alt="lol it didn't load" /><br />
+It seems that items listed above are machines where we can check files within its filesystem. We exapanded HOST-WIN-DX130S2.<br />
+<img src="img/helpfuldesk/10.png" alt="lol it didn't load" /><br />
+We can see that under Desktop, flag.txt can be seen. It is also downloadable.<br />
+<img src="img/helpfuldesk/11.png" alt="lol it didn't load" /><br />
+We can retrieve the flag inside the flag.txt<br /></p>
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>

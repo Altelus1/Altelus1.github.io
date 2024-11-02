@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      
+    <meta name="twitter:title" content="MOVEable">
+    <meta name="twitter:description" content="MOVEable">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="https://altelus1.github.io/writeups/ctf/huntressctf2024/img/moveable/1.png" />
+    
+    <meta property="og:image" content="/writeups/ctf/huntressctf2024/img/moveable/1.png">
+    <meta property="og:description" content="MOVEable">
+    <title>MOVEable</title><!-- Begin Jekyll SEO tag v2.8.0 -->
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="MOVEable" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/writeups/ctf/huntressctf2024/moveable.html" />
+<meta property="og:url" content="http://localhost:4000/writeups/ctf/huntressctf2024/moveable.html" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MOVEable" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"MOVEable","url":"http://localhost:4000/writeups/ctf/huntressctf2024/moveable.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" type="text/css" href="/assets/main-dark.css"></head>
+
+
+<body>
+    <div class="container"><header>
+  <div class="menu">
+    <ul><li><a href="/">Home</a></li><li><a href="/about.html">About</a></li><li><a href="/writeups/">Writeups</a></li><li><a href="/projects/">Projects</a></li></ul>
+  </div>
+</header>
+<main>
+      <h1 id="web-moveable">[Web] MOVEable</h1>
+<p>The following challenge description has been given:<br />
+<img src="img/moveable/1.png" alt="lol it didn't load" /><br />
+Landing page is below:<br />
+<img src="img/moveable/1.5.png" alt="lol it didn't load" /><br />
+We are not given any credentials for this login portal. We also tried some obvious username and passwords but none worked. We looked at the given source code. (Please pretend hello.db is not there.)<br />
+<img src="img/moveable/2.png" alt="lol it didn't load" /><br />
+Let’s take a look at the app.py.<br />
+Below is the /login function<br />
+<img src="img/moveable/3.png" alt="lol it didn't load" /><br />
+As pointed out in the screenshot, the SQL query is being run through <code class="language-plaintext highlighter-rouge">executescript()</code>. This means that multiple SQL queries can be executed as long as they are separated by <code class="language-plaintext highlighter-rouge">;</code>. The SQL query is also easily injected but because of DBClient(), instead of escaping and then injecting it with a single quote, we pass <code class="language-plaintext highlighter-rouge">\</code> instead and it will replace it with single quote.<br />
+Another point also is that the <code class="language-plaintext highlighter-rouge">executescript()</code> will not return anything therefore our login attempts will always fail. Further below is the /download endpoint.<br />
+<img src="img/moveable/4.png" alt="lol it didn't load" /><br />
+Two parameters are needed: (1) filename and (2) sessionid<br />
+<code class="language-plaintext highlighter-rouge">filename</code> and <code class="language-plaintext highlighter-rouge">sessionid</code> supplied must already be existing on the database but due to broken login endpoint, we can’t create sessionid from it. However, we can abuse the <code class="language-plaintext highlighter-rouge">executescript()</code> from the /login to insert our own filename and sessionid.<br />
+Another thing to point out is the <code class="language-plaintext highlighter-rouge">pickle.loads</code> execution without sanitization from the loaded base64 data from <code class="language-plaintext highlighter-rouge">files</code> database. It is a calssic python pickle deserialization vulnerability and thus our entry point to execute code.<br />
+The plan formulated is this:
+1) On <code class="language-plaintext highlighter-rouge">/login</code>, create a query that adds a row data to <code class="language-plaintext highlighter-rouge">activesessions</code> table.
+2) Create a malicious pickled base64 data - it executes a reverse shell connecting to our machine.
+3) On <code class="language-plaintext highlighter-rouge">/login</code>, create a query that inserts the base64 blob from step 2 to <code class="language-plaintext highlighter-rouge">files</code> table.
+4) Trigger the deserialization exploit and the payload by calling <code class="language-plaintext highlighter-rouge">/download/&lt;filename&gt;/&lt;sessionid&gt;</code>
+<br />The table schema is also given through the init db of <code class="language-plaintext highlighter-rouge">app.py</code>.<br />
+<img src="img/moveable/6.png" alt="lol it didn't load" /><br />
+Step 1 - We created a query to insert into <code class="language-plaintext highlighter-rouge">activesessions</code>:
+<br /></p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">activesessions</span> <span class="k">VALUES</span> <span class="p">(</span><span class="s1">'aaa'</span><span class="p">,</span><span class="s1">'aaa'</span><span class="p">,</span><span class="s1">'aaa'</span><span class="p">);</span>
+</code></pre></div></div>
+<p><br />Due to <code class="language-plaintext highlighter-rouge">DBClean()</code> deleting spaces, we used <code class="language-plaintext highlighter-rouge">/**/</code> (a comment syntax) to separate the SQL keywords. We also replaced the single quotes with backslash (We doubled in this case to escape it). So here is the final HTTP parameters to use:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Empty username</span>
+<span class="nv">username</span><span class="o">=</span>
+
+<span class="c"># Password payload: ';INSERT INTO activesessions VALUES ('aaa','aaa','aaa');/*</span>
+<span class="c"># Our sessionid to use is "aaa"</span>
+<span class="nv">password</span><span class="o">=</span><span class="se">\\</span><span class="p">;</span>INSERT/<span class="k">**</span>/INTO/<span class="k">**</span>/activesessions/<span class="k">**</span>/VALUES/<span class="k">**</span>/<span class="o">(</span><span class="se">\\</span>aaa<span class="se">\\</span>,<span class="se">\\</span>aaa<span class="se">\\</span>,<span class="se">\\</span>aaa<span class="se">\\</span><span class="o">)</span><span class="p">;</span>/<span class="k">*</span> <span class="c"># </span>
+</code></pre></div></div>
+<p><br />cURL payload below:<br />
+<img src="img/moveable/7.png" alt="lol it didn't load" /><br />
+Redirect response is an indicator our SQL execution is successful.<br />
+Step 2 - We create a pickled data with reverse shell payload in it.<br />
+<img src="img/moveable/8.png" alt="lol it didn't load" /><br />
+<img src="img/moveable/9.png" alt="lol it didn't load" />
+<br /></p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">files</span> <span class="k">VALUES</span> <span class="p">(</span><span class="s1">'filename1'</span><span class="p">,</span><span class="s1">'&lt;base64 blob&gt;'</span><span class="p">,</span><span class="s1">'aaa'</span><span class="p">)</span>
+</code></pre></div></div>
+<p><br />Below is the cURL parameters:
+<br /></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Empty username</span>
+<span class="nv">username</span><span class="o">=</span>
+
+<span class="c"># Password payload: ';INSERT INTO files VALUES ('filename1','&lt;base64 blob&gt;','aaa');/*</span>
+<span class="c"># Our filename to use is "filename1"</span>
+<span class="nv">password</span><span class="o">=</span><span class="se">\\</span><span class="p">;</span>INSERT/<span class="k">**</span>/INTO/<span class="k">**</span>/files/<span class="k">**</span>/VALUES/<span class="k">**</span>/<span class="o">(</span><span class="se">\\</span>filename1<span class="se">\\</span>,<span class="se">\\</span>&lt;<span class="nb">base64 </span>blob&gt;<span class="se">\\</span>,<span class="se">\\</span>aaa<span class="se">\\</span><span class="o">)</span><span class="p">;</span>/<span class="k">*</span>
+</code></pre></div></div>
+<p><br />Actual execution:
+<br /><img src="img/moveable/10.png" alt="lol it didn't load" /><br />
+A redirect response is received again. Looks good. We now have to trigger the execution. We can do it by visiting <code class="language-plaintext highlighter-rouge">/download/filename1/aaa</code><br />
+<img src="img/moveable/11.png" alt="lol it didn't load" /><br />
+It worked! We now have to escalate our privileges.<br />
+Turns out, we can execute sudo without password. We got root and found the flag.<br />
+<img src="img/moveable/12.png" alt="lol it didn't load" /><br /></p>
+
+
+
+    </main><footer>
+  
+</footer>
+</div>
+  </body>
+</html>
